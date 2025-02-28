@@ -1,0 +1,355 @@
+{
+    "openapi":"3.0.3",
+    "info": {
+      "title":"Pengguna Api",
+      "description":"Pengguna Api",
+      "version":"1.0"
+    },
+    "servers": [
+      {"url":"https://api.server.test/v1"}
+    ],
+    "paths": {
+        "/api/pengguna" : {
+            "post" : {
+                "description": "Register new user",
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "examples": {
+                                "gita":{
+                                    "description": "Register User Gita",
+                                    "value":{
+                                        "nama":"Gita Aulia",
+                                        "email":"gita@gmail.com",
+                                        "password":"password"
+                                    }
+                                }
+                            },
+                            "schema":{
+                                "type" : "object",
+                                "required":[
+                                    "name" , "email", "password"
+                                ],
+                                "properties": {
+                                    "nama":{
+                                        "type":"string"
+                                    },
+                                    "email":{
+                                        "type" : "string"
+                                    },
+                                    "password" :{
+                                        "type":"string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400" : {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json":{
+                                "examples":{
+                                    "validationerror":{
+                                        "description": "validation error",
+                                        "value":{
+                                            "errors":{
+                                                "nama":[
+                                                    "nama harus diisi!"
+                                                ],
+                                                "email":[
+                                                    "email harus valid",
+                                                    "email harus diisi!"
+                                                ],
+                                              "password":[
+                                                    "password harus diisi!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "201":{
+                        "description": "Success Register User",
+                        "content":{
+                            "application/json":{
+                                "examples":{
+                                    "success":{
+                                        "description":"Success Register User",
+                                            "value":{
+                                                "data":{
+                                                    "slug":"gita",
+                                                    "name":"gita",
+                                                    "email":"gita@gmail.com"
+                                                }
+                                            }
+                                    }
+                                },
+                                    "schema":{
+                                        "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama":{
+                                                        "type":"string"
+                                                    },
+                                                    "email":{
+                                                        "type":"string"
+                                                    }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                       
+                    }
+                }
+
+            }
+        },
+        "api/pengguna/login" : {
+            "post": {
+                "description" : "Login User", 
+                "requestBody":{
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "required":[
+                                        "email", "password"
+                                    ],
+                                    "type":"object",
+                                    "properties":{
+                                       "email":{
+                                        "type":"string"
+                                       },
+                                       "password":{
+                                        "type":"string"
+                                       }
+                                    }
+                                }
+                            }
+                              
+                        }
+                },
+                "responses":{
+                    "200":{
+                        "description":"Berhasil Login",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                        "type":"object",
+                                       
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama":{
+                                                        "type":"string"
+                                                    },
+                                                    "email":{
+                                                        "type":"string"
+                                                    },
+                                                    "token":{
+                                                        "type":"string"
+                                                    }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+
+                    }
+                }
+            }
+        },
+        "api/pengguna/current" : {
+            "get" : {
+                "description" : "Get Current user",
+                "parameters":[
+                   {
+                    "nama": "Authorization",
+                    "in" :"header"
+                   }
+                ],
+                "responses":{
+                    "200":{
+                         "description":"Berhasil Ambil Data Pengguna Saat Ini",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama":{
+                                                        "type":"string"
+                                                    },
+                                                    "email":{
+                                                        "type":"string"
+                                                    }
+                                                   
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            },
+            "patch" : {
+                "description":"Update Current User",
+                "parameters":[
+                   {
+                    "nama": "Authorization",
+                    "in" :"header"
+                   }
+                ],
+                "requestBody":{
+                    "description":"Ubah Data Pengguna Saat Ini ",
+                    "content":{
+                        "application/json":{
+                            "schema":{
+                               "type":"object",
+                               "properties":{
+                                    "nama":{
+                                        "type":"string"
+                                    },
+                                    "alamat":{
+                                        "type":"string"
+                                    },
+                                    "provinsi":{
+                                        "type":"string"
+                                    },
+                                    "kode_pos":{
+                                        "type":"string"
+                                    },
+                                    "pendidikan_terakhir":{
+                                        "type":"string"
+                                    },
+                                    "pekerjaan":{
+                                        "type":"string"
+                                    }
+                               }
+                            }
+                        }
+                    }
+                },
+                "responses":{
+                    "200":{
+                         "description":"Berhasil Ubah Data",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama":{
+                                                        "type":"string"
+                                                    },
+                                                    "email":{
+                                                        "type":"string"
+                                                    },
+                                                    "alamat":{
+                                                        "type":"string"
+                                                    },
+                                                    "provinsi":{
+                                                        "type":"string"
+                                                    },
+                                                    "kode_pos":{
+                                                        "type":"string"
+                                                    },
+                                                    "pendidikan_terakhir":{
+                                                        "type":"string"
+                                                    },
+                                                    "pekerjaan":{
+                                                        "type":"string"
+                                                    }
+                                                   
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        },
+        "api/pengguna/logout":{
+            "delete":{
+                "description":"Logout Current User",
+                "parameters":[
+                   {
+                    "nama": "Authorization",
+                    "in" :"header"
+                   }
+                ],
+                "responses":{
+                   "200":{
+                         "description":"Berhasil Logout",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"boolean"   
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+  }

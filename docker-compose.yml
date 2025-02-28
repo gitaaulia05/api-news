@@ -1,0 +1,35 @@
+
+services:
+  laravel_franken:
+     container_name : laravel_franken
+     image: image_laravel_franken
+     build: 
+        dockerfile: worker.dockerfile
+        context: .
+     ports:
+        - 8001:8000
+     volumes:
+      - .:/app
+      - /app/vendor
+     env_file:
+        - .env
+     depends_on:
+     - db
+  db:
+    image: mysql:8
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: portalberita
+      MYSQL_user: root
+      MYSQL_password: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+ 
+volumes:
+    mysql_data:
+
+
+  

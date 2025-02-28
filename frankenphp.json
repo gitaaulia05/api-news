@@ -1,0 +1,11 @@
+{
+  "servers": [
+    {
+      "listen": "0.0.0.0:8001",
+      "tls": {
+        "certificate": "172.23.67.4.pem",
+        "certificate_key": "172.23.67.4-key.pem"
+      }
+    }
+  ]
+}
