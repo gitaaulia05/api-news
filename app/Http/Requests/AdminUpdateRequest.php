@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PenggunaCreateRequest extends FormRequest
+class AdminUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,8 @@ class PenggunaCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'alpha'],
-            'email' =>['required' , 'email:rfc,dns' ,'unique:pengguna,email'],
-            'password' => ['required'],
+            'gambar' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
+            'nama' => ['required']
         ];
     }
 

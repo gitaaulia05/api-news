@@ -2,35 +2,31 @@
 
 namespace App\Models;
 
+use Cviebrock\EloquentSluggable\Sluggable;
 use App\Models\PasswordResetToken;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Pengguna extends Model implements Authenticatable
+class Administrator extends Model  implements Authenticatable
 {
     use HasFactory;
-    
-    use Sluggable;
-    protected $table = "pengguna";
-    protected $primaryKey = "id_pengguna";
+    use sluggable;
+    protected $primaryKey = "id_administrator";
+    protected $table = "administrators";
     protected $keyType="string";
 
     protected $fillable = [
-        'id_pengguna',
+        'id_administrator',
         'slug',
         'nama',
+        'gambar',
         'email',
-        'password',
-        'alamat',
-        'provinsi',
-        'kode_pos',
-        'pendidikan_terakhir',
-        'pekerjaan',
-        'token',
-    ];
-
+        'password', 
+        'active',
+        'role', 
+        'token'
+    ];  
 
     public function sluggable(): array
     {
@@ -42,17 +38,18 @@ class Pengguna extends Model implements Authenticatable
         ];
     }
 
+    
     public function passwordResetTokens(){
         return $this->morphMany(PasswordResetToken::class , 'resettable');
     }
 
-
+    
     public function getAuthIdentifierName(){
         return 'nama';
 }
 
 public function getAuthIdentifier(){
-        return $this->id_pengguna;
+        return $this->id_administrator;
 }
 
 public function getAuthPassword(){
@@ -76,4 +73,3 @@ public function getRememberTokenName(){
 }
 
 }
-

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PenggunaCreateRequest extends FormRequest
+class JurnalisRegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,14 +25,14 @@ class PenggunaCreateRequest extends FormRequest
     {
         return [
             'nama' => ['required', 'alpha'],
-            'email' =>['required' , 'email:rfc,dns' ,'unique:pengguna,email'],
-            'password' => ['required'],
+            'email' => ['required' , 'email:rfc,dns'],
+            'password' => ['required' , 'min:8'],
         ];
     }
 
-    Protected function failedValidator(Validator $validator) {
+    protected function failedValidation(Validator $validator) {
         throw new HttpResponseException(response([
             "errors" => $validator->getMessageBag()
-        ],400));
+        ], 400));
     }
 }

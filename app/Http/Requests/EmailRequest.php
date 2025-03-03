@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests;
 
+use Log;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PenggunaCreateRequest extends FormRequest
+class EmailRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +25,7 @@ class PenggunaCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'alpha'],
-            'email' =>['required' , 'email:rfc,dns' ,'unique:pengguna,email'],
-            'password' => ['required'],
+            'email' => ['required' , 'email:rfc,dns'],
         ];
     }
 

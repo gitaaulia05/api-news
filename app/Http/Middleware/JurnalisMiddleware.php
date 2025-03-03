@@ -3,12 +3,12 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\Models\Pengguna;
 use Illuminate\Http\Request;
+use App\Models\Administrator;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class PenggunaMiddleware
+class JurnalisMiddleware
 {
     /**
      * Handle an incoming request.
@@ -17,24 +17,25 @@ class PenggunaMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->header('Authorization');
-        
-        if($token && str_starts_with($token, 'Bearer ')){
-            $token = substr($token, 7);
+
+        $tokenJurnal = $request->header('Authorization');
+
+        if($tokenJurnal && str_starts_with($tokenJurnal , 'Bearer ')){
+            $tokenJurnal = substr($tokenJurnal, 7);
         }
 
         $authenticate = true;
 
-        if(!$token) {
+        if(!$tokenJurnal){
             $authenticate = false;
         }
 
-        $pengguna = Pengguna::where('token' , $token)->first();
+        $jurnalis = Administrator::where('token' , $tokenJurnal)->where('role' , 2)->first();
 
-        if(!$pengguna) {
+        if(!$jurnalis ||  $jurnalis->role !== 2){
             $authenticate = false;
         } else {
-            Auth::login($pengguna);
+            Auth::login($jurnalis);
         }
 
         if($authenticate){
@@ -43,11 +44,11 @@ class PenggunaMiddleware
             return response()->json([
                 "errors" => [
                     "message" => [
-                        "Tidak ter-authentikasi"
+                        "Tidak Ter-authentikasi"
                     ]
                 ]
             ])->setStatusCode(401);
         }
-    
+       
     }
 }

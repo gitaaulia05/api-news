@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class PenggunaLoginRequest extends FormRequest
 {
@@ -22,8 +24,14 @@ class PenggunaLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' =>['required'],
+            'email' =>['required' , 'email:rfc,dns'],
             'password' =>['required']
         ];
+    }
+
+    Protected function failedValidator(Validator $validator) {
+        throw new HttpResponseException(response([
+            "errors" => $validator->getMessageBag()
+        ],400));
     }
 }

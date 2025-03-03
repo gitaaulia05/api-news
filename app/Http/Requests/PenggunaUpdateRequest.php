@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class PenggunaUpdateRequest extends FormRequest
 {
@@ -23,14 +25,20 @@ class PenggunaUpdateRequest extends FormRequest
     {
         return [
             'nama' => ['required', 'alpha'],
-            'email' =>['required' , 'email:rfc,dns' ,'unique:pengguna,column,except,id'],
-            'password' => ['required'],
-            'alamat' => ['required'],
-            'provinsi' => ['required'],
-            'password' => ['required'],
-            'kode_pos' => ['required', 'numeric'],
-            'pendidikan_terakhir' => ['required'],
-            'pekerjaan' => ['required'],
+            'password' => ['nullable'],
+            'alamat' => ['nullable'],
+            'provinsi' => ['nullable'],
+            'password' => ['nullable'],
+            'kode_pos' => ['nullable', 'numeric'],
+            'pendidikan_terakhir' => ['nullable'],
+            'pekerjaan' => ['nullable'],
         ];
     }
+
+    Protected function failedValidator(Validator $validator) {
+        throw new HttpResponseException(response([
+            "errors" => $validator->getMessageBag()
+        ],400));
+    }
 }
+

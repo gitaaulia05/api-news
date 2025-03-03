@@ -3,12 +3,12 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\Models\Pengguna;
 use Illuminate\Http\Request;
+use App\Models\Administrator;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class PenggunaMiddleware
+class AdminMiddleware
 {
     /**
      * Handle an incoming request.
@@ -17,24 +17,28 @@ class PenggunaMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->header('Authorization');
-        
-        if($token && str_starts_with($token, 'Bearer ')){
-            $token = substr($token, 7);
-        }
+       
 
+        $tokenAdmin = $request->header('Authorization');
+
+        if($tokenAdmin && str_starts_with($tokenAdmin, 'Bearer ')){
+            $tokenAdmin = substr($tokenAdmin, 7);
+        }
         $authenticate = true;
-
-        if(!$token) {
+        
+        if(!$tokenAdmin){
             $authenticate = false;
         }
 
-        $pengguna = Pengguna::where('token' , $token)->first();
+      
 
-        if(!$pengguna) {
+        $administrator = Administrator::where('token' , $tokenAdmin)->where('role' , 1)->first();
+       
+        if(!$administrator || $administrator->role != 1 ){
             $authenticate = false;
+          
         } else {
-            Auth::login($pengguna);
+            Auth::login($administrator);
         }
 
         if($authenticate){
@@ -48,6 +52,7 @@ class PenggunaMiddleware
                 ]
             ])->setStatusCode(401);
         }
-    
+
+       
     }
 }

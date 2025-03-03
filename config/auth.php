@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Pengguna;
+use App\Models\Administrator;
+
 return [
 
     /*
@@ -43,6 +46,10 @@ return [
         'pengguna' => [
             'driver' => 'session',
             'provider' => 'pengguna'
+        ],
+        'administrator' => [
+            'driver' => 'session',
+            'provider' =>  'administrator',
         ]
     ],
 
@@ -70,8 +77,12 @@ return [
         ],
         'pengguna' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Pengguna::class,
+            'model' => Pengguna::class,
         ],
+        'administrator' => [
+            'driver' => 'eloquent',
+            'model' => Administrator::class,
+        ]
 
         // 'users' => [
         //     'driver' => 'database',
