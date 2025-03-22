@@ -30,11 +30,13 @@ class PenggunaMiddleware
         }
 
         $pengguna = Pengguna::where('token' , $token)->first();
-
+    
         if(!$pengguna) {
             $authenticate = false;
         } else {
-            Auth::login($pengguna);
+            
+            Auth::guard('pengguna')->login($pengguna);
+          
         }
 
         if($authenticate){

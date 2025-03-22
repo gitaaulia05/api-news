@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PasswordResetToken extends Model
 {
-    protected $table = "password_reset_tokens";
+    protected $table = "password_reset_token";
     protected $primaryKey = "id";
     protected $keyType = "string";
     public $timestamps = false;

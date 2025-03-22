@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -13,7 +14,7 @@ class JurnalisActiveRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::guard('administrator')->check();
     }
 
     /**
@@ -29,9 +30,9 @@ class JurnalisActiveRequest extends FormRequest
         ];
     }
 
-    Protected function failedValidator(Validator $validator) {
+    protected function failedValidation(Validator $validator) {
         throw new HttpResponseException(response([
             "errors" => $validator->getMessageBag()
-        ],400));
+        ], 400));
     }
 }

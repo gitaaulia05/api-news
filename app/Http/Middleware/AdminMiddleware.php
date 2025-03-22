@@ -17,8 +17,6 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-       
-
         $tokenAdmin = $request->header('Authorization');
 
         if($tokenAdmin && str_starts_with($tokenAdmin, 'Bearer ')){
@@ -33,12 +31,12 @@ class AdminMiddleware
       
 
         $administrator = Administrator::where('token' , $tokenAdmin)->where('role' , 1)->first();
-       
         if(!$administrator || $administrator->role != 1 ){
             $authenticate = false;
           
         } else {
-            Auth::login($administrator);
+            Auth::guard('administrator')->login($administrator);
+           
         }
 
         if($authenticate){

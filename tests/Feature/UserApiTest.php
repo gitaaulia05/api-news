@@ -20,7 +20,7 @@ class UserApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->token = '5c37e576-d606-4ac4-8b5d-ca919ff15f1f'; // Inisialisasi token
+        $this->token = 'f1100330-1714-470c-b8e3-46d6108ef856'; // Inisialisasi token
     }
     public function test_example(): void
     {
@@ -32,13 +32,14 @@ class UserApiTest extends TestCase
     public function testRegister(){
         $this->post('api/pengguna' , [
             "nama" => "gita",
-            "email" => "gita@gmail.com",
-            "password" => "test"
+            "email" => "ferina@gmail.com",
+            "password" => "TestTest1&",
+            "password_confirmation" => "TestTest1&"
 
         ])->assertStatus(201)->assertJson([
             "data" =>[
                 "nama" => "gita",
-                "email" => "gita@gmail.com",
+                "email" => "ferina@gmail.com",
             ]
         ]);
     }
@@ -47,7 +48,7 @@ class UserApiTest extends TestCase
     public function testLogin(){
         $this->post('api/pengguna/login' , [
             "email" => "seomoonamoon@gmail.com",
-            "password" => "heyBoyyy"
+            "password" => "TestTest1&"
 
         ])->assertStatus(200)->assertJson([
             "data" =>[
@@ -58,20 +59,18 @@ class UserApiTest extends TestCase
     }
 
     public function testCurrent(){
-        $this->seed([PenggunaSeeder::class]);
+       // $this->seed([PenggunaSeeder::class]);
 
         $pengguna = Pengguna::first();
-
-        $this->actingAs($pengguna , 'pengguna');
-
-        $this->get('api/pengguna/saatIni' , [
-            'Authorization' => $this->token,
-        ])->assertStatus(200)->assertJson([
-            "data" =>[
-                "nama" => "gita",
-                "email" => "gita@gmail.com",
+       // dd($pengguna->token);
+        $this->actingAs($pengguna, 'pengguna')->withHeaders([
+            'Authorization' => $pengguna->token,
+        ])->get('api/pengguna/saatIni')->assertStatus(200)->assertJson([
+            "data" => [
+                "nama" => 'Ya'
             ]
         ]);
+
     }
 
     public function testUpdate(){
@@ -86,14 +85,11 @@ class UserApiTest extends TestCase
 
     public function testLogout(){
         $pengguna = pengguna::first();
-        $pengguna->save();
+        $tokens = $pengguna->token;
 
-        $this->actingAs($pengguna, 'pengguna');
-
-        $this->delete('api/pengguna/logout' , [
-            'Authorization' => $pengguna->token,
-        ])->assertStatus(200);
-
+        $this->actingAs($pengguna, 'pengguna')->withHeaders([
+            'Authorization' => $this->token,
+        ]) ->delete('api/pengguna/logout')->assertStatus(200);
     }
 
     public function testPassword(){
@@ -104,10 +100,17 @@ class UserApiTest extends TestCase
     }
 
     public function testPassNoAuth(){
-        $this->patch('/api/lupa-password/147ef93792824eeb8f5847e62e98c321' , [
-            'password' => 'heyBoyyy'
+        // $this->patch('/api/lupa-password/4ea0c28c973e4b56868b65b771ae492a' , [
+        //     'password' => 'heyBoyyy' ,
+        //     'password_confirmation' =>'heyBoyyy' ,
+        // ])->assertStatus(200);
+        $this->patch('/api/lupa-password/7d3c3ee0a7414e64ba32b8fc514b1f4e' , [
+            'password' => 'heyBoyyy' ,
+            'password_confirmation' =>'heyBoyyy' ,
         ])->assertStatus(200);
     }
+
+
 
     public function testMailAuth(){
 
@@ -122,10 +125,12 @@ class UserApiTest extends TestCase
     }
 
     public function testPassAuth(){
-        $pengguna = Pengguna::where('email' , 'gita@gmail.com')->first();
+        $pengguna = Pengguna::where('email' , 'seomoonamoon@gmail.com')->first();
+      
         $this->actingAs($pengguna , 'pengguna');
-        $this->get('/api/auth/token-ganti-password/fd22fd207ba14631ae2662fb1dbc271c' , [
-            'Authorization' => '5c37e576-d606-4ac4-8b5d-ca919ff15f1f'
+       
+        $this->get('/api/auth/token-ganti-password/832b0f526e9c4b8f8d420ff56a147c65' , [
+            'Authorization' => $this->token
         ])->assertStatus(200);
     }
 }

@@ -19,7 +19,7 @@ class JurnalisMiddleware
     {
 
         $tokenJurnal = $request->header('Authorization');
-
+        
         if($tokenJurnal && str_starts_with($tokenJurnal , 'Bearer ')){
             $tokenJurnal = substr($tokenJurnal, 7);
         }
@@ -31,11 +31,11 @@ class JurnalisMiddleware
         }
 
         $jurnalis = Administrator::where('token' , $tokenJurnal)->where('role' , 2)->first();
-
+     
         if(!$jurnalis ||  $jurnalis->role !== 2){
             $authenticate = false;
         } else {
-            Auth::login($jurnalis);
+            Auth::guard('administrator')->login($jurnalis);
         }
 
         if($authenticate){

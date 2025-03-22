@@ -2,13 +2,21 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\berita;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use App\Models\gambar_berita;
+use App\Models\kategori_berita;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\NewsResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\AdminResource;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AdminLoginRequest;
+use App\Http\Requests\NewsCreateRequest;
 use App\Http\Requests\JurnalisRegisterRequest;
 
 class JurnalisController extends Controller
@@ -18,7 +26,7 @@ class JurnalisController extends Controller
 
         $jurnalis = Administrator::where('email' , $data['email'])->first();
 
-        if(! $jurnalis || !Hash::check($data['password'] ,  $jurnalis->password)){
+        if(!$jurnalis || !Hash::check($data['password'] ,  $jurnalis->password)){
             throw new HttpResponseException(response([
                 "errors" => [
                     "message" => [
@@ -46,4 +54,5 @@ class JurnalisController extends Controller
 
         return (new AdminResource($jurnalis))->response()->setStatusCode(201);
     }
+
 }

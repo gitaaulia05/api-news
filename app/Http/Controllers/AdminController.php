@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\AdminResource;
@@ -36,6 +38,11 @@ class AdminController extends Controller
         return (new AdminResource($admin));
     }
 
+    public function currentAdmin( Request $request) : AdminResource
+        {
+                $admin = Auth::guard('administrator')->user();
+                return new AdminResource($admin);
+        }
     public function updateActive(JurnalisActiveRequest $request , $slugJurnalis) : AdminResource{
             $jurnalis = Administrator::where('slug' , $slugJurnalis)->first();
             $jurnalisId =Administrator::where('id_administrator' , $jurnalis->id_administrator)->first();
@@ -71,7 +78,7 @@ class AdminController extends Controller
     public function updateData(AdminUpdateRequest $request , $slugAdmin) : AdminResource{
         $administratorAuth = Auth::guard('administrator')->user();
 
-        //dd($administratorAuth->slug);
+        // dd($administratorAuth->slug);
         $adminSlug = Administrator::where('slug' , $slugAdmin)->first();
 
             $adminId = Administrator::where('id_administrator' , $adminSlug->id_administrator)->first();
@@ -121,9 +128,7 @@ class AdminController extends Controller
     }
 
     public function showData($slugAdmin) : AdminResource{
-
         $adminCheck = Administrator::where('slug' , $slugAdmin)->first();
-      
         if(!$adminCheck){
             throw new HttpResponseException(response()->json([
                 "errors"=>[
@@ -137,7 +142,7 @@ class AdminController extends Controller
         $authAdmin = Auth::guard('administrator')->user();
         $authPengguna = Auth::guard('pengguna')->user();
         $jurnalis = null;
-
+       
        // dd($authPengguna->slug == $adminCheck->slug);
         if ($adminCheck->role == 1 && $authAdmin && $authAdmin->slug == $adminCheck->slug) {
                 $jurnalis = Administrator::where('slug' , $slugAdmin)->where('role',1)->first();
@@ -165,7 +170,13 @@ class AdminController extends Controller
 
 
     public function logout(Request $request) : JsonResponse {
+
         $admin = Auth::guard('administrator')->user();
+        
+        if(!$admin) {
+            return response()->json(['errors' => 'Unauthorized'] , 401);
+        }
+
         $admin->token = null;
         $admin->save();
 

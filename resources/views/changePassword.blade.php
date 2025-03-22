@@ -9,7 +9,7 @@
 <h5>Klik Tautan dibawah untuk ganti password</h5>
    {{-- ganti ke halaman frontend --}}
       {{-- pass ke frontend -> request ke api valid apa ga -> buka halaman frontend --}}
-<a href="{{ url('/gantiPassword/' . $msg)}}"> Url Ganti Password </a>
+<a href="{{ url('http://127.0.0.1:9090/ganti-password/' . $msg)}}"> Url Ganti Password </a>
 <p style="color:red;">tidak untuk disebar luaskan !</p>
 </body>
 </html>

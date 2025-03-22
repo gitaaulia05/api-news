@@ -25,13 +25,13 @@ class PenggunaLoginRequest extends FormRequest
     {
         return [
             'email' =>['required' , 'email:rfc,dns'],
-            'password' =>['required']
+            'password' => ['required']
         ];
     }
 
-    Protected function failedValidator(Validator $validator) {
+    protected function failedValidation(Validator $validator) {
         throw new HttpResponseException(response([
             "errors" => $validator->getMessageBag()
-        ],400));
+        ], 400));
     }
 }

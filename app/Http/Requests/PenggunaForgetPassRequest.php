@@ -24,12 +24,12 @@ class PenggunaForgetPassRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => ['required' , 'min:8'],
+            'password' => ['required' , 'confirmed' , 'min:8'],
             
         ];
     }
 
-    protected function vailedValidator(Validator $validator){
+    protected function FailedValidation(Validator $validator){
         throw new HttpResponseException(response([
             "errors" => $validator->getMessageBag()
         ], 400));

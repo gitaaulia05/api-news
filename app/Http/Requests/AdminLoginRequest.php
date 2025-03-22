@@ -29,9 +29,11 @@ class AdminLoginRequest extends FormRequest
         ];
     }
 
-    Protected function failedValidator(Validator $validator) {
+    protected function failedValidator(Validator $validator) {
         throw new HttpResponseException(response([
             "errors" => $validator->getMessageBag()
         ],400));
     }
+
+    
 }

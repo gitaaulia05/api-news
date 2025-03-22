@@ -18,6 +18,7 @@ class AdminResource extends JsonResource
             'nama' => $this->nama,
             'email' => $this->email,
             'gambar' => $this->gambar,
+            'token' => $this->token,
             'role' => $this->role,
             'active' => $this->active,
         ];

@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\Pengguna;
 use App\Models\Administrator;
+use Database\Seeders\AdminSeeder;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -25,7 +27,7 @@ class AdminApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->token = '1a6a3344-6f77-4df1-9c7a-aef79bd3a21c'; // Inisialisasi token
+        $this->token = 'baacec51-6979-47f9-90e9-1d712058ac1e'; // Inisialisasi token
     }
 
     public function testUpdateActive(){
@@ -41,23 +43,26 @@ class AdminApiTest extends TestCase
     }
 
     public function testLogin(){
-    
+        $this->seed([AdminSeeder::class]);
         $this->post('/api/admin/login' , [
-            'email' => 'gigiaull35@gmail.com',
+            'email' => 'gitaauliahafid@gmail.com',
             'password' => 'tebakzzz'
         ])->assertStatus(200);
     }
 
     public function testUpdateData(){
 
-        $pengguna = Administrator::where('nama' , 'hihi')->first();
+        // $pengguna = Administrator::where('nama' , 'gita')->first();
 
-        $this->actingAs($pengguna , 'administrator');
+        // $this->actingAs($pengguna , 'administrator');
+        $pengguna = Pengguna::where('email' , 'seomoonamoon@gmail.com')->first();
+      
+        $this->actingAs($pengguna , 'pengguna');
 
         $admin = Administrator::where('role', 1)->first();
         
         $this->patch('/api/admin/update/'. $admin->slug  ,[
-            "nama" => "hihi", 
+            "nama" => "kim", 
            // "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true)
         ], [
             'Authorization' => $this->token
@@ -70,7 +75,6 @@ class AdminApiTest extends TestCase
             ]
         ]);
     }
-
 
     public function testLogout(){
         
@@ -96,15 +100,17 @@ class AdminApiTest extends TestCase
     }
 
     public function testDetail(){
+      ///  $this->seed([AdminSeeder::class]);
         $administrator = Administrator::where('nama' , 'hihi')->first();
         $this->actingAs($administrator , 'administrator');
 
-        $this->get('/api/admin/jurnalis/hihi', [
+        $this->get('/api/admin/jurnalis/gita', [
             'Authorization' => $this->token
         ])->assertStatus(200);
     }
 
     public function testDetailJurnalis(){
+        
         $administrator = Administrator::where('nama' , 'hihi')->first();
         $this->actingAs($administrator , 'administrator');
 

@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use App\Http\Resources\PenggunaResource;
 
 use App\Http\Requests\PenggunaLoginRequest;
@@ -62,12 +62,11 @@ class PenggunaController extends Controller
                 ]
             ], 401));
         }
-
             $pengguna->token = (String) Str::uuid()->toString();
 
             $pengguna->save();
 
-            return (new PenggunaResource($pengguna));
+            return new PenggunaResource($pengguna);
         
     }
 
@@ -89,18 +88,17 @@ class PenggunaController extends Controller
             return ( new PenggunaResource($pengguna));
     }
 
-
         public function sendEmail(EmailRequest $request) : JsonResponse {
             $email = $request->validated(); 
             $pengguna = Pengguna::where('email' , $email['email'])->first() ?? Administrator::where('email' , $email['email'])->first();
             if(!$pengguna){
             throw new HttpResponseException(response()->json([
-                'errors' => [
-                    "message" => [
-                        "Email Tidak Sesuai"
+                "data" => [
+                        "message" =>  "Email Berhasil dikirim Ke email anda" ,
+                        "email" => $email['email'],
+                        "message2" => "Periksa Email Anda Untuk Reset Password"
                     ]
-                ]
-            ])->setStatusCode(404));
+            ])->setStatusCode(200));
             }
 
          $passwordToken =  PasswordResetToken::updateOrCreate(
@@ -124,23 +122,24 @@ class PenggunaController extends Controller
                      //sent email ke pengguna
                 Mail::to($pengguna->email)->send(new NewsApi($msg, $subject));
                 return  response()->json([
-                    "data" => "telah dikirim ke " . $pengguna->email
+                    "data" => [
+                        "message" =>  "Email Berhasil dikirim Ke email anda" ,
+                        "email" => $pengguna->email,
+                        "message2" => "Periksa Email Anda Untuk Reset Password"
+                    ]
                 ])->setStatusCode(200);
 
 }
 
-        public function storeNewPassword(){
-
-        }
-
     public function sendEmailAuth(EmailRequest $request) : JsonResponse{
-        \Log::info('Masuk ke sendEmailAuth', ['request_data' => $request->all()]);
+
+    \Log::info('Masuk ke sendEmailAuth', ['request_data' => $request->all()]);
 
      $pengguna = Auth::guard('pengguna')->user();
-    $administrator = Auth::guard('administrator')->user();
+     $administrator = Auth::guard('administrator')->user();
 
     $user = $pengguna ?? $administrator;
-        dd($user);
+    \Log::info($user);
          if(!$user) {
             throw new HttpResponseException(response()->json([
                 'errors' => [
@@ -188,14 +187,21 @@ class PenggunaController extends Controller
             );
 
                 $msg = $passwordToken['token'];
+                
                 $subject = "Ganti Password Akun Portal Berita WinniCode";
 
                 //sent email ke pengguna
                 Mail::to($pengguna->email)->send(new NewsApiAuth($msg, $subject));
             return  response()->json([
-                "data" => "telah dikirim ke " . $pengguna->email
+                "data" => [
+                    "message" =>  "Email Berhasil dikirim Ke email anda" ,
+                    "email" => $pengguna->email,
+                    "message2" => "Periksa Email Anda Untuk Reset Password"
+                ]
             ])->setStatusCode(200);
 }
+
+
 
 // store without auth
     public function forgetPassword(PenggunaForgetPassRequest $request , $token) : JsonResponse{
@@ -205,7 +211,7 @@ class PenggunaController extends Controller
            throw new HttpResponseException(response()->json([
             "errors" => [
                 "message" => [
-                    "Token Tidak Valid !"
+                    "Halaman Tidak Valid, Kirim Kembali Kode Ke Email Anda!"
                 ]
             ]
            ])->setStatusCode(404));
@@ -219,7 +225,6 @@ class PenggunaController extends Controller
         ]);
         
         $password->delete();
-
         return response()->json([
             'data' => true,
             'owner' => $owner->nama
@@ -228,8 +233,40 @@ class PenggunaController extends Controller
 
     }
 
+// Store with Auth
+    public function storeNewPassword(PenggunaForgetPassRequest $request , $token) : JsonResponse {
+        \Log::info('masu');
+     $pengguna = Auth::guard('pengguna')->user();
+\Log::info($pengguna. 'nih');
+        $password= PasswordResetToken::where('token' , $token)->first();
+      
+        if(!$password || !$pengguna){
+           throw new HttpResponseException(response()->json([
+            "errors" => [
+                "message" => [
+                    "Halaman Tidak Valid, Kirim Kembali Kode Ke Email Anda!"
+                ]
+            ]
+           ])->setStatusCode(404));
+        }
+
+        $owner = $password->resettable;
+        $data = $request->validated();
+         
+        $owner->update([
+            'password' => Hash::make($data['password']),
+        ]);
+        
+        $password->delete();
+        return response()->json([
+            'data' => true,
+            'owner' => $owner->nama
+        ])->setStatusCode(200);
+    }
+
     public function logout(Request $request) :JsonResponse {
                 $pengguna = Auth::guard('pengguna')->user();
+                
                 $pengguna->token = null;
                 $pengguna->save();
 
@@ -244,23 +281,20 @@ public function checkToken($token) : JsonResponse {
     if(empty($tokens) || $tokens->auth == "auth" ){
             return response()->json([
                 "data" => false,
-                "message" => "Token Tidak Valid!"
+                "message" => "Halaman Tidak Valid, Kirim Kembali Kode Ke Email Anda!"
             ])->setStatusCode(404);
-       // return view("welcome");
+   
     }
         if(Carbon::parse($tokens->created_at)->addMinutes(10) > now()  && $tokens->auth !== "auth" ){
             return response()->json([
                 "data" => true,
                 "message" => $token
             ])->setStatusCode(200);
-        // return view('password' , [
-        //     'token' => $token
-        // ]);
         } else {    
-       // return view("welcome");
+   
        return response()->json([
         "data" => false,
-        "message" => "Token telah expired ulangi kirim ke email!"
+        "message" => "Halaman Tidak valid, Silahkan Kirim Tautan Kembali ke Email Anda"
     ])->setStatusCode(410);
         }
 }
@@ -286,14 +320,10 @@ public function checkToken($token) : JsonResponse {
         }
 
 
-        public function PassAuthView($token) :JsonResponse {
+public function PassAuthView($token) :JsonResponse {
+
             $tokenCheck =  PasswordResetToken::where('token' , $token)->first();
-
-          
             $pengguna = Auth::guard('pengguna')->user();
-
-            dd($pengguna);
-
             if(!$pengguna){
                 throw new HttpResponseException(response()->json([
                     "errors" => [
@@ -328,9 +358,6 @@ public function checkToken($token) : JsonResponse {
                     ]
                    ])->setStatusCode(404));
             }
-
-
-
         }
 
 

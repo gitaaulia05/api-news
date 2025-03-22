@@ -26,13 +26,13 @@ class PenggunaCreateRequest extends FormRequest
         return [
             'nama' => ['required', 'alpha'],
             'email' =>['required' , 'email:rfc,dns' ,'unique:pengguna,email'],
-            'password' => ['required'],
+            'password' => ['required' , 'confirmed' ,  'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'],
         ];
     }
 
-    Protected function failedValidator(Validator $validator) {
+    protected function failedValidation(Validator $validator) {
         throw new HttpResponseException(response([
             "errors" => $validator->getMessageBag()
-        ],400));
+        ], 400));
     }
 }

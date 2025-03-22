@@ -29,9 +29,9 @@ class EmailRequest extends FormRequest
         ];
     }
 
-    Protected function failedValidator(Validator $validator) {
+    protected function failedValidation(Validator $validator) {
         throw new HttpResponseException(response([
             "errors" => $validator->getMessageBag()
-        ],400));
+        ], 400));
     }
 }

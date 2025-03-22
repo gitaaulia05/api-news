@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('nama');
             $table->string('gambar')->nullable();
-            $table->string('email');
+            $table->string('email')->unique();
             $table->string('password');
             $table->boolean('role');
             $table->boolean('active');

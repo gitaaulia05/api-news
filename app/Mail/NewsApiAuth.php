@@ -19,8 +19,8 @@ class NewsApiAuth extends Mailable
      */
     public function __construct($msg , $subject)
     {
-        $this->msg;
-        $this->subject;
+        $this->msg = $msg;
+        $this->subject = $subject;
     }
 
     /**
