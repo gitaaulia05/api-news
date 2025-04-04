@@ -24,7 +24,7 @@ class PenggunaForgetPassRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => ['required' , 'confirmed' , 'min:8'],
+            'password' => ['required' , 'confirmed' , 'min:8' , 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'],
             
         ];
     }

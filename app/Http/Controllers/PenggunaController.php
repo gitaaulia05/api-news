@@ -91,6 +91,7 @@ class PenggunaController extends Controller
         public function sendEmail(EmailRequest $request) : JsonResponse {
             $email = $request->validated(); 
             $pengguna = Pengguna::where('email' , $email['email'])->first() ?? Administrator::where('email' , $email['email'])->first();
+
             if(!$pengguna){
             throw new HttpResponseException(response()->json([
                 "data" => [
@@ -115,7 +116,7 @@ class PenggunaController extends Controller
                 
             );
             $owner = $passwordToken->resettable;
-           
+         
                 $msg = $passwordToken['token'];
                 $subject = "Ganti Password Akun Portal Berita WinniCode";
 
@@ -133,13 +134,12 @@ class PenggunaController extends Controller
 
     public function sendEmailAuth(EmailRequest $request) : JsonResponse{
 
-    \Log::info('Masuk ke sendEmailAuth', ['request_data' => $request->all()]);
-
      $pengguna = Auth::guard('pengguna')->user();
      $administrator = Auth::guard('administrator')->user();
 
     $user = $pengguna ?? $administrator;
-    \Log::info($user);
+
+
          if(!$user) {
             throw new HttpResponseException(response()->json([
                 'errors' => [
@@ -161,7 +161,7 @@ class PenggunaController extends Controller
             ])->setStatusCode(302));
          }
 
-            if($pengguna->email !== $data['email']){
+            if($user->email !== $data['email']){
                 throw new HttpResponseException(response()->json([
                     'errors' => [
                         'message' => [
@@ -175,8 +175,8 @@ class PenggunaController extends Controller
             $passwordToken =  PasswordResetToken::updateOrCreate(
                 [ 
                     'id' => (String) Str::uuid(),
-                    'resettable_id' => $pengguna->getKey(),
-                    'resettable_type' => get_class($pengguna),
+                    'resettable_id' => $user->getKey(),
+                    'resettable_type' => get_class($user),
                     'auth' => 'auth'
                 ],
                 [
@@ -191,11 +191,11 @@ class PenggunaController extends Controller
                 $subject = "Ganti Password Akun Portal Berita WinniCode";
 
                 //sent email ke pengguna
-                Mail::to($pengguna->email)->send(new NewsApiAuth($msg, $subject));
+                Mail::to($user->email )->send(new NewsApiAuth($msg, $subject));
             return  response()->json([
                 "data" => [
                     "message" =>  "Email Berhasil dikirim Ke email anda" ,
-                    "email" => $pengguna->email,
+                    "email" => $user->email,
                     "message2" => "Periksa Email Anda Untuk Reset Password"
                 ]
             ])->setStatusCode(200);
@@ -226,21 +226,24 @@ class PenggunaController extends Controller
         
         $password->delete();
         return response()->json([
-            'data' => true,
-            'owner' => $owner->nama
+            'data' => [
+                'success' => true,
+            'owner' => $owner->resettable_id,
+            'type' => get_class($owner), 
+            'role' => $owner instanceof App\Models\Administrator ? $owner->role : 'user'
+            ]
         ])->setStatusCode(200);
-
-
     }
 
 // Store with Auth
     public function storeNewPassword(PenggunaForgetPassRequest $request , $token) : JsonResponse {
-        \Log::info('masu');
+      
      $pengguna = Auth::guard('pengguna')->user();
-\Log::info($pengguna. 'nih');
+     $administrator = Auth::guard('administrator')->user();
+
         $password= PasswordResetToken::where('token' , $token)->first();
       
-        if(!$password || !$pengguna){
+        if(!$password || !$administrator){
            throw new HttpResponseException(response()->json([
             "errors" => [
                 "message" => [
@@ -320,11 +323,25 @@ public function checkToken($token) : JsonResponse {
         }
 
 
-public function PassAuthView($token) :JsonResponse {
+    public function PassAuthView($token) :JsonResponse {
 
             $tokenCheck =  PasswordResetToken::where('token' , $token)->first();
+
+            if(empty($tokenCheck) || $tokenCheck->auth !== "auth" || Carbon::parse($tokenCheck->created_at)->addMinutes(10)->isPast()){
+                throw new HttpResponseException(response()->json([
+                    "errors" => [
+                        "message" => [
+                            "Token Tidak Valid !"
+                        ]
+                    ]
+                   ])->setStatusCode(404));
+            }
+
             $pengguna = Auth::guard('pengguna')->user();
-            if(!$pengguna){
+            $Administrator = Auth::guard('administrator')->user();
+           $user = Auth::guard('pengguna')->user() ??  Auth::guard('administrator')->user();
+
+            if(!$user){
                 throw new HttpResponseException(response()->json([
                     "errors" => [
                         "message" => [
@@ -335,12 +352,20 @@ public function PassAuthView($token) :JsonResponse {
 
             }
 
+            
+
             $owner = $tokenCheck->resettable;
+
             if($owner instanceof Pengguna && $pengguna && $owner->id_pengguna === $pengguna->id_pengguna){
                 return response()->json([
                     "data" => true
                 ])->setStatusCode(200);
-            } else {
+            }elseif($owner instanceof Administrator && $Administrator && $owner->id_administrator === $Administrator->id_administrator){
+                return response()->json([
+                    "data" => true
+                ])->setStatusCode(200);
+            }
+             else {
                 return response()->json([
                     "data" => [
                          "data" => false,
@@ -349,15 +374,7 @@ public function PassAuthView($token) :JsonResponse {
                 ])->setStatusCode(404);
             }
             
-            if(empty($tokenCheck) || $tokenCheck->auth !== "auth" || Carbon::parse($tokenCheck->created_at)->addMinutes(10)){
-                throw new HttpResponseException(response()->json([
-                    "errors" => [
-                        "message" => [
-                            "Token Tidak Valid !"
-                        ]
-                    ]
-                   ])->setStatusCode(404));
-            }
+          
         }
 
 

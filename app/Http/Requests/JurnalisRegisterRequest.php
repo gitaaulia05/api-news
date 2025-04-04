@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\UniqueEmailAcrossRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -25,10 +26,11 @@ class JurnalisRegisterRequest extends FormRequest
     {
         return [
             'nama' => ['required', 'alpha'],
-            'email' => ['required' , 'email:rfc,dns'],
-            'password' => ['required' , 'min:8'],
+            'email' => ['required' , 'email:rfc,dns' , new UniqueEmailAcrossRule()],
+            'password' => ['required' , 'confirmed','regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/', 'min:8' ]
         ];
     }
+    
 
     protected function failedValidation(Validator $validator) {
         throw new HttpResponseException(response([

@@ -18,7 +18,7 @@ class AdminSeeder extends Seeder
         Administrator::create([
             "id_administrator" => (String) Str::uuid(),
             "nama" => 'gita',
-            "email" => 'gitaauliahafid@gmail.com',
+            "email" => 'seomoonamoon@gmail.com',
             "role" => 1,
             "active" => 1,
             'password' => Hash::make('tebakzzz'),

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AdminLoginRequest;
 use App\Http\Requests\NewsCreateRequest;
 use App\Http\Requests\JurnalisRegisterRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class JurnalisController extends Controller
 {

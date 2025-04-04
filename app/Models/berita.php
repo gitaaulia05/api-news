@@ -4,19 +4,23 @@ namespace App\Models;
 
 use App\Models\berita;
 use Illuminate\Database\Eloquent\Model;
+use Coderflex\Laravisit\Concerns\CanVisit;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Coderflex\Laravisit\Concerns\HasVisits;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Berita extends Model
+class Berita extends Model implements CanVisit
 {
-    use HasFactory;
+    
+    use HasFactory, Sluggable , HasVisits;
+    use  SoftDeletes;
+
 
     protected $table = 'beritas'; 
-
     protected $primaryKey = 'id_berita'; 
-
     public $incrementing = false; 
-    use Sluggable;
+    protected $dates = ['deleted_at'];
     protected $fillable = [
         'id_berita',
         'id_administrator',
@@ -24,6 +28,7 @@ class Berita extends Model
         'judul_berita',
         'deks_berita',
         'is_tayang',
+        'deleted_at',
         'created_at',
         'updated_at'
     ];
@@ -47,5 +52,10 @@ class Berita extends Model
     public function gambar_berita()
     {
         return $this->hasMany(gambar_berita::class, 'id_berita', 'id_berita');
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug'; // Laravel akan mencari berdasarkan kolom 'slug'
     }
 }

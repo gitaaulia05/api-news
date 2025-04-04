@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('id_administrator')->references('id_administrator')->on('administrators')->onDelete('cascade');
             $table->text('deks_berita');
             $table->string('gambar');
+            $table->datetime('delete_at');
             $table->timestamps();
         });
     }

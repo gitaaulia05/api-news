@@ -2,19 +2,21 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\UniqueEmailAcrossRule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
+
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PenggunaCreateRequest extends FormRequest
+
+class NewsUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::guard('administrator')->check();
     }
 
     /**
@@ -25,11 +27,16 @@ class PenggunaCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'alpha'],
-            'email' =>['required' , 'email:rfc,dns' ,new UniqueEmailAcrossRule()],
-            'password' => ['required' , 'confirmed' ,  'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'],
+            'judul_berita' => ['required'],
+            'deks_berita' => ['required'],
+            'kategori' => ['required' , 'string'],
+            'gambar' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
+            'gambar2' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
+            'keterangan_gambar' => ['required'],
+            'keterangan_gambar2' => ['nullable'],
         ];
     }
+
 
     protected function failedValidation(Validator $validator) {
         throw new HttpResponseException(response([

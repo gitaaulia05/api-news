@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('gambar_berita');
             $table->string('keterangan_gambar');
             $table->string('posisi_gambar' , 30);
+            $table->timestamp('deleted_at');
             $table->timestamps();
         });
     }

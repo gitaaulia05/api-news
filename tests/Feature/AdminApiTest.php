@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\berita;
 use App\Models\Pengguna;
 use App\Models\Administrator;
 use Database\Seeders\AdminSeeder;
@@ -45,7 +46,7 @@ class AdminApiTest extends TestCase
     public function testLogin(){
         $this->seed([AdminSeeder::class]);
         $this->post('/api/admin/login' , [
-            'email' => 'gitaauliahafid@gmail.com',
+            'email' => 'seomoonamoon@gmail.com',
             'password' => 'tebakzzz'
         ])->assertStatus(200);
     }
@@ -117,6 +118,16 @@ class AdminApiTest extends TestCase
         $this->get('/api/admin/jurnalis/niks', [
             'Authorization' => $this->token
         ])->assertStatus(200);
+    }
+
+    public function testSearchBerita() {
+        $administrator = Administrator::where('nama' , 'gita')->first();
+        $this->actingAs($administrator , 'administrator');
+        $berita = berita::withTrashed()->first();
+          $this->get('/api/berita/'.$berita->slug, [
+            'Authorization' => $this->token
+        ])->dump();
+      
     }
 }
 

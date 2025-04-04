@@ -20,7 +20,7 @@ class UserApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->token = 'f1100330-1714-470c-b8e3-46d6108ef856'; // Inisialisasi token
+       // $this->token = '58bd302f-708e-4c78-9eca-4140e223a511'; // Inisialisasi token
     }
     public function test_example(): void
     {
@@ -47,7 +47,7 @@ class UserApiTest extends TestCase
 
     public function testLogin(){
         $this->post('api/pengguna/login' , [
-            "email" => "seomoonamoon@gmail.com",
+            "email" => "ferina@gmail.com",
             "password" => "TestTest1&"
 
         ])->assertStatus(200)->assertJson([
@@ -132,5 +132,23 @@ class UserApiTest extends TestCase
         $this->get('/api/auth/token-ganti-password/832b0f526e9c4b8f8d420ff56a147c65' , [
             'Authorization' => $this->token
         ])->assertStatus(200);
+    }
+
+
+    // MAIN FEATURE
+
+    public function testCounterNews(){
+        $this->get('/api/berita/ekonomi/lala')->dump();
+    }
+
+    public function testCounterNewsToken(){
+        $this->get('/api/berita/ekonomi/lala' , [
+            'Authorization' => $this->token
+        ])->assertStatus(200);
+    }
+
+
+    public function testPopularNews(){
+        $this->get('/api/berita/populer')->dump();
     }
 }

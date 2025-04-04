@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\berita;
 use App\Models\Administrator;
-use Illuminate\Foundation\Testing\WithFaker;
+// use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Faker\Factory as Faker;
+use Illuminate\Support\Facades\File;
+use Illuminate\Http\UploadedFile;
 
 class JurnalisApiTest extends TestCase
 {
@@ -17,7 +20,7 @@ class JurnalisApiTest extends TestCase
 
     protected function setUp() : void {
         parent::setUp();
-        $this->token = '45d14a7f-763e-47b4-b753-fc5d401a3195';
+        $this->token = '49da6fea-5bb7-4647-b087-b37efe726f9b';
     }
 
 
@@ -32,8 +35,9 @@ class JurnalisApiTest extends TestCase
     public function testRegister() {
         $this->post('api/jurnalis' , [
             "nama" => "niks",
-            "email" => "niks@gmail.com",
-            "password" => "tebakzzz"
+            "email" => "niki@gmail.com",
+            "password" => "Cobatebakk1*",
+            "password_confirmation" => "Cobatebakk1*",
 
         ])->assertStatus(201)->assertJson([
             "data" => [
@@ -46,21 +50,22 @@ class JurnalisApiTest extends TestCase
     }
 
     public function testLogin(){
+        // Cobatebakk1* ->gitaauliahafd@gmail.com
         $this->post('/api/jurnalis/login' , [
             'email' => 'gitaauliahafid@gmail.com',
-            'password' => 'tebakzzz'
+            'password' => 'Tebakzzz1@'
         ])->assertStatus(200);
     }
 
     public function testUpdateData(){
-        $pengguna = Administrator::where('nama' , 'hihi')->first();
-
+        $pengguna = Administrator::where('nama' , 'siakk')->first();
+         
         $this->actingAs($pengguna , 'administrator');
 
         $admin = Administrator::where('role', 2)->first();
-
-        $this->patch('/api/jurnalis/update/hihi-2'  ,[
-            "nama" => "siakk"
+        //dd($admin);
+        $this->post('/api/jurnalis/update/siakk'  ,[
+            "nama" => "gitas"
         ], [
             'Authorization' => $this->token
         ])->assertStatus(200)->assertJson([
@@ -96,32 +101,145 @@ class JurnalisApiTest extends TestCase
         ])->assertStatus(200);
     }
 
+    // public function testAddNews(){
+    //     $this->post('/api/jurnalis/addNews', [
+    //         "judul_berita" => "lalas",
+    //         "deks_berita" => "hahaha",
+    //        "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+    //        "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+    //        "kategori" => "Teknologi", 
+    //        'keterangan_gambar' => "fmdmdm",
+    //        'keterangan_gambar2' => "fmdmdm"
+    //     ], [
+    //         'Authorization' => $this->token
+    //     ])->assertStatus(201);
+    // }
+
+
     public function testAddNews(){
-        $this->post('/api/jurnalis/addNews', [
-            "judul_berita" => "hym",
-            "deks_berita" => "hahaha",
-           "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-           "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-           "kategori" => "economics", 
-           'keterangan_gambar' => "fmdmdm",
-           'keterangan_gambar2' => "fmdmdm"
-        ], [
-            'Authorization' => $this->token
-        ])->assertStatus(201);
+        $faker = Faker::create();
+        $categories = ['Ekonomi', 'Teknologi', 'Politik', 'Hiburan', 'Olahraga'];
+        $imageFiles = File::files(resource_path('testImg'));
+    
+        foreach (range(1, 20) as $index) {
+            $randomImage = $imageFiles[array_rand($imageFiles)];  // Memilih gambar secara acak
+            $randomCategory = $categories[array_rand($categories)];  // Memilih kategori secara acak
+    
+            $this->post('/api/jurnalis/addNews', [
+                "judul_berita" => $faker->sentence,
+                "deks_berita" => $faker->paragraph,
+                "gambar" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
+                "gambar2" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
+                "kategori" => $randomCategory, 
+                'keterangan_gambar' => $faker->sentence,
+                'keterangan_gambar2' => $faker->sentence
+            ], [
+                'Authorization' => $this->token
+            ])->assertStatus(201);
+        }
     }
 
-
     public function testUpdateNews(){
-        $berita = berita::first();
+        $berita = berita::where('slug' , 'yaalah')->first();
+
         $this->post('/api/jurnalis/updateNews/'. $berita->slug, [
             "judul_berita" => "yaalah",
+            "deks_berita" => "huhiha",
+        //    "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+        //    "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+           "kategori" => "slibaw", 
+           'keterangan_gambar' => "hmm ah",
+          'keterangan_gambar2' => "hm"
+        ], [
+            'Authorization' => $this->token
+        ])->assertStatus(200)->assertJson([
+            'data' => [
+                "judul_berita" => "yaalah",
             "deks_berita" => "huhiha",
            "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
            "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
            "kategori" => "slibaw", 
            'keterangan_gambar' => "hmm ah",
           'keterangan_gambar2' => "hm"
-        ], [
+            ]
+        ]
+        );
+    }
+
+
+    public function testSearchNews(){
+        $this->get('/api/berita/pengguna?newest=2025-04-04',[
+            'If-None-Match' => "3aa18f5f9e0dc2af1a53a049217a0755"
+        ],  [
+        ])->assertStatus(200);
+
+    }
+
+    public function testDeleteNews(){
+        $berita = berita::where('slug' , 'lala')->first();
+    
+        $this->get('/api/berita/delete/'.$berita->slug, [
+            'Authorization' => $this->token
+        ])->assertStatus(200);
+    }
+
+    public function testRestoreNews(){
+       // $berita = berita::where('slug' , 'hymz')->first();
+       $berita = berita::withTrashed()->where('slug' , 'lala')->first();
+        //dd($berita);
+        $this->get('/api/berita/restore/'.$berita->slug, [
+            'Authorization' => $this->token
+        ])->assertStatus(200);
+    }
+
+    public function testDetailNews() {
+        $berita = berita::withTrashed()->where('slug' , 'lala')->first();
+        //dd($berita);
+        $this->get('/api/jurnalis/berita/'.$berita->slug, [
+            'Authorization' => $this->token
+        ])->assertStatus(200);
+    }
+
+    public function testEmailSend() {
+        $this->post('/api/gantiPassword/', [
+            'email' => 'gitaauliahafid@gmail.com'
+        ])->assertStatus(200);
+    
+    }
+
+    public function testEmailSendAuth() {
+        $pengguna = Administrator::where('nama' , 'gitas')->first();
+
+        $this->actingAs($pengguna , 'administrator');
+        $this->post('/api/auth/gantiPasswordPengguna', [
+            'email' => 'gitaauliahafid@gmail.com'
+        ], 
+        [
+            'Authorization' => $this->token
+        ])->assertStatus(200);
+    
+    }
+
+    public function testStorePass(){
+        $pengguna = Administrator::where('nama' , 'gitas')->first();
+
+        $this->actingAs($pengguna , 'administrator');
+        $this->patch('/api/auth/lupa-password-store/bc0f29a7b10c4de5a7ddbc64e822609d', [
+            'password' => 'Tebakzzz1@', 
+            'password_confirmation' => 'Tebakzzz1@', 
+
+        ], 
+        [
+            'Authorization' => $this->token
+        ])->assertStatus(200);
+    }
+    
+    public function testAuthToken(){
+        $pengguna = Administrator::where('nama' , 'gitas')->first();
+        //dd($pengguna);
+        $this->actingAs($pengguna , 'administrator');
+        $this->get('/api/auth/token-ganti-password/c828696d5ef341e8873d0b794710f512', 
+        [
             'Authorization' => $this->token
         ])->assertStatus(200);
     }
