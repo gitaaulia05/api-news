@@ -10,7 +10,7 @@ use Coderflex\Laravisit\Concerns\HasVisits;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Berita extends Model implements CanVisit
+class berita extends Model implements CanVisit
 {
     
     use HasFactory, Sluggable , HasVisits;
@@ -20,10 +20,12 @@ class Berita extends Model implements CanVisit
     protected $table = 'beritas'; 
     protected $primaryKey = 'id_berita'; 
     public $incrementing = false; 
+    protected $keyType = 'string'; // atau 'int' kalau integer
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'id_berita',
         'id_administrator',
+        'id_kategori_berita',
         'slug',
         'judul_berita',
         'deks_berita',
@@ -45,7 +47,7 @@ class Berita extends Model implements CanVisit
 
     public function kategori_berita()
     {
-        return $this->hasMany(kategori_berita::class, 'id_berita', 'id_berita');
+        return $this->belongsTo(kategori_berita::class, 'id_kategori_berita', 'id_kategori_berita');
     }
 
 
@@ -56,6 +58,8 @@ class Berita extends Model implements CanVisit
 
     public function getRouteKeyName()
     {
-        return 'slug'; // Laravel akan mencari berdasarkan kolom 'slug'
+        return 'slug'; 
     }
+
+
 }

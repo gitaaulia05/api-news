@@ -12,15 +12,14 @@ class kategori_berita extends Model
 
     protected $primaryKey='id_kategori_berita';
     protected $table='kategori_beritas';
-    protected $ketType="string";
+    protected $keyType="string";
 
     protected $fillable = [ 
         'id_kategori_berita',
-        'id_berita', 
         'kategori'
     ];
 
-    public function berita() : belongsTo{
-        return $this->belongsTo(berita::class , 'id_berita' , 'id_berita');
+    public function berita() {
+        return $this->hasMany(berita::class , 'id_kategori_berita' , 'id_kategori_berita');
     }
 }

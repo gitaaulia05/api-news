@@ -19,10 +19,8 @@ class PenggunaResource extends JsonResource
             'nama' => $this->nama,
             'email' => $this->email,
             'alamat' => $this->alamat,
-            'provinsi' => $this->provinsi,
             'token' => $this->token,
             'role' => $this->role,
-            'kode_pos' => $this->kode_pos,
             'pendidikan_terakhir' => $this->pendidikan_terakhir,
             'pekerjaan' => $this->pekerjaan,
         ];

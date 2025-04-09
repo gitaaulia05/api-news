@@ -25,7 +25,7 @@ class PenggunaCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'alpha'],
+            'nama' => ['required'],
             'email' =>['required' , 'email:rfc,dns' ,new UniqueEmailAcrossRule()],
             'password' => ['required' , 'confirmed' ,  'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'],
         ];

@@ -17,9 +17,11 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('id_administrator');
             $table->foreign('id_administrator')->references('id_administrator')->on('administrators')->onDelete('cascade');
+            $table->string('id_kategori_berita');
+            $table->foreign('id_kategori_berita')->references('id_kategori_berita')->on('kategori_beritas')->onDelete('cascade');
             $table->text('deks_berita');
-            $table->string('gambar');
-            $table->datetime('delete_at');
+            $table->char('is_tayang')->default('1');
+            $table->datetime('deleted_at')->nullable();
             $table->timestamps();
         });
     }

@@ -25,7 +25,7 @@ class NewsCreateRequest extends FormRequest
         return [
             'judul_berita' => ['required'],
             'deks_berita' => ['required'],
-            'kategori' => ['required' , 'string'],
+            'id_kategori_berita' => ['required'],
             'gambar' => ['required' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
             'gambar2' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
             'keterangan_gambar' => ['required'],

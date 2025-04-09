@@ -3,10 +3,12 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\Pengguna;
 use Illuminate\Http\Request;
+use App\Models\Administrator;
 use Symfony\Component\HttpFoundation\Response;
 
-class UniversalMiddleware
+class EmailMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,27 +17,24 @@ class UniversalMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $tokenJurnal = $request->header('Authorization');
-        
-      
-        if($tokenJurnal && str_starts_with($tokenJurnal , 'Bearer ')){
-            $tokenJurnal = substr($tokenJurnal, 7);
+        $token = $request->header('Authorization');
+        if($token && str_starts_with($token, 'Bearer ')){
+            $token = substr($token, 7);
         }
 
         $authenticate = true;
 
-        if(!$tokenJurnal){
+        if(!$token) {
             $authenticate = false;
         }
 
-        $jurnalis = Administrator::where('token' , $tokenJurnal)->where('role' , 2)->first();
-       
-        if(!$jurnalis ||  $jurnalis->role !== 2){
+        $user = Pengguna::where('token' , $token)->first() ?? Administrator::where('token' , $token)->first();
+
+        if(!$user) {
             $authenticate = false;
         } else {
-            Auth::guard('administrator')->login($jurnalis);
+            $authenticate = true;
         }
-
         if($authenticate){
             return $next($request);
         } else {

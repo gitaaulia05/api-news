@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('gambar_beritas', function (Blueprint $table) {
             $table->string('id_gambar')->primary();
             $table->string('id_berita');
+            $table->string('slug');
             $table->foreign('id_berita')->references('id_berita')->on('beritas')->onDelete('cascade');
             $table->string('gambar_berita');
             $table->string('keterangan_gambar');
             $table->string('posisi_gambar' , 30);
-            $table->timestamp('deleted_at');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

@@ -19,7 +19,7 @@ class JurnalisMiddleware
     {
 
         $tokenJurnal = $request->header('Authorization');
-      
+
         if($tokenJurnal && str_starts_with($tokenJurnal , 'Bearer ')){
             $tokenJurnal = substr($tokenJurnal, 7);
         }

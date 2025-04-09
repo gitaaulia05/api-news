@@ -17,7 +17,7 @@ class UniqueEmailAcrossRule implements ValidationRule
     {
          if(
             DB::table('pengguna')->where('email' , $value)->exists() ||
-            DB::table('admin')->where('email' , $value)->exists() 
+            DB::table('administrators')->where('email' , $value)->exists() 
          ){
                 $fail('Email Sudah di Gunakan, Gunakan Email yang Lain !');
          }

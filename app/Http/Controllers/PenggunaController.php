@@ -133,18 +133,15 @@ class PenggunaController extends Controller
 }
 
     public function sendEmailAuth(EmailRequest $request) : JsonResponse{
-
-     $pengguna = Auth::guard('pengguna')->user();
-     $administrator = Auth::guard('administrator')->user();
-
-    $user = $pengguna ?? $administrator;
-
+        $email = $request->validated(); 
+        $pengguna = Pengguna::where('email' , $email['email'])->first() ?? Administrator::where('email' , $email['email'])->first();
+        $user = $pengguna;
 
          if(!$user) {
             throw new HttpResponseException(response()->json([
                 'errors' => [
                     'message' => [
-                        'Anda Belum Login Silahkan Login Terlebih Dahulu !'
+                        'Email Tidak Sesuai dengan Akun yang Sedang Login !'
                     ]
                 ]
             ])->setStatusCode(401));
@@ -206,8 +203,15 @@ class PenggunaController extends Controller
 // store without auth
     public function forgetPassword(PenggunaForgetPassRequest $request , $token) : JsonResponse{
         $password= PasswordResetToken::where('token' , $token)->first();
-      
-        if(!$password){
+        $token = $request->header('Authorization');
+
+        if($token && str_starts_with($token, 'Bearer ')){
+            $token = substr($token, 7);
+        }
+
+        $pengguna = Pengguna::where('token' , $token)->first() ?? Administrator::where('token' , $token)->first();
+
+        if(!$password ){
            throw new HttpResponseException(response()->json([
             "errors" => [
                 "message" => [
@@ -216,6 +220,19 @@ class PenggunaController extends Controller
             ]
            ])->setStatusCode(404));
         }
+
+
+        if($password->auth == 'auth' && $pengguna)
+        {
+            throw new HttpResponseException(response()->json([
+             "errors" => [
+                 "message" => [
+                     "Halaman Tidak Valid"
+                 ]
+             ]
+            ])->setStatusCode(404));
+         }
+        
 
         $owner = $password->resettable;
         $data = $request->validated();
@@ -237,13 +254,15 @@ class PenggunaController extends Controller
 
 // Store with Auth
     public function storeNewPassword(PenggunaForgetPassRequest $request , $token) : JsonResponse {
-      
-     $pengguna = Auth::guard('pengguna')->user();
-     $administrator = Auth::guard('administrator')->user();
+        $tokenHeader = $request->header('Authorization'); 
 
+        if($tokenHeader && str_starts_with($tokenHeader, 'Bearer ')){
+            $tokenHeader = substr($tokenHeader, 7);
+        }
         $password= PasswordResetToken::where('token' , $token)->first();
-      
-        if(!$password || !$administrator){
+        $pengguna = Pengguna::where('token' , $tokenHeader)->first() ?? Administrator::where('token' , $tokenHeader)->first();
+
+        if(!$password){
            throw new HttpResponseException(response()->json([
             "errors" => [
                 "message" => [
@@ -254,6 +273,25 @@ class PenggunaController extends Controller
         }
 
         $owner = $password->resettable;
+        
+        if($owner instanceof Pengguna  && $owner->id_pengguna !== $pengguna->id_pengguna){
+            throw new HttpResponseException(response()->json([
+                "errors" => [
+                    "message" => [
+                        "Halaman Tidak Valid!"
+                    ]
+                ]
+               ])->setStatusCode(404));
+        } elseif($owner instanceof Administrator  && $owner->id_administrator !== $pengguna->id_administrator){
+            throw new HttpResponseException(response()->json([
+                "errors" => [
+                    "message" => [
+                        "Halaman Tidak Valid!"
+                    ]
+                ]
+               ])->setStatusCode(404));
+        }
+       
         $data = $request->validated();
          
         $owner->update([
@@ -323,9 +361,15 @@ public function checkToken($token) : JsonResponse {
         }
 
 
-    public function PassAuthView($token) :JsonResponse {
+    public function PassAuthView($token, Request $request) :JsonResponse {
 
             $tokenCheck =  PasswordResetToken::where('token' , $token)->first();
+
+            $token = $request->header('Authorization');
+
+            if($token && str_starts_with($token, 'Bearer ')){
+                $token = substr($token, 7);
+            }
 
             if(empty($tokenCheck) || $tokenCheck->auth !== "auth" || Carbon::parse($tokenCheck->created_at)->addMinutes(10)->isPast()){
                 throw new HttpResponseException(response()->json([
@@ -334,13 +378,10 @@ public function checkToken($token) : JsonResponse {
                             "Token Tidak Valid !"
                         ]
                     ]
-                   ])->setStatusCode(404));
+                   ])->setStatusCode(401));
             }
 
-            $pengguna = Auth::guard('pengguna')->user();
-            $Administrator = Auth::guard('administrator')->user();
-           $user = Auth::guard('pengguna')->user() ??  Auth::guard('administrator')->user();
-
+            $user = Pengguna::where('token' , $token)->first() ?? Administrator::where('token' , $token)->first();
             if(!$user){
                 throw new HttpResponseException(response()->json([
                     "errors" => [
@@ -352,15 +393,13 @@ public function checkToken($token) : JsonResponse {
 
             }
 
-            
-
             $owner = $tokenCheck->resettable;
 
-            if($owner instanceof Pengguna && $pengguna && $owner->id_pengguna === $pengguna->id_pengguna){
+            if($owner instanceof Pengguna  && $owner->id_pengguna === $user->id_pengguna){
                 return response()->json([
                     "data" => true
                 ])->setStatusCode(200);
-            }elseif($owner instanceof Administrator && $Administrator && $owner->id_administrator === $Administrator->id_administrator){
+            }elseif($owner instanceof Administrator  && $owner->id_administrator === $user->id_administrator){
                 return response()->json([
                     "data" => true
                 ])->setStatusCode(200);

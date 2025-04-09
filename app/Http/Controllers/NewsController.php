@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use session;
 use Carbon\Carbon;
 use App\Models\berita;
@@ -68,34 +69,52 @@ class NewsController extends Controller
 
         $newsQuery = berita::withTrashed();
 
-
         $nama = $request->input('judul_berita');
         $newest = $request->input('newest');
-        $weekNews = $request->input('weekNews');
+        $selectedTopics = $request->input('selectedTopics');
 
-        $newsQuery->where(function (Builder $query) use ($nama , $newest, $weekNews) {
+        // $newsQuery->where(function (Builder $query) use ($nama , $newest, $selectedTopics,) {
           
                 if($nama) {
-                    $query->where('judul_berita' , 'like' , '%'.$nama.'%');
+                    $newsQuery->where('judul_berita' , 'like' , '%'.$nama.'%');
                 }
 
                 if($newest !== NULL) {
-                       
                     $hasTodayNews = berita::withTrashed()->where('updated_at', 'like' , '%'. $newest . '%')->exists();
-                  
+                    $yesterdayNews = Carbon::parse($newest)->subDay()->toDateString();
                         if(!$hasTodayNews){
-                            $yesterdayNews = Carbon::parse($newest)->subDay()->toDateString();
-                            dd($yesterdayNews);
-                            $query->where('updated_at', 'like' , '%'. $yesterdayNews . '%');
+                            $newsQuery->where('updated_at', 'like' , '%'. $yesterdayNews . '%');
                         } else {
-                            $query->where('updated_at', 'like' , '%'. $newest . '%');
-                        }
-                }
+                            $newsQuery->where('updated_at', 'like' , '%'. $newest . '%')->orWhere('updated_at', 'like' , '%'. $yesterdayNews . '%');
+                        }   
 
-                if($weekNews !== NULL) {
-                    dd('hahaha');
+                        cache(['news_tag' => $newsQuery->get()->toArray()]);
+                } 
+
+                if(filter_var($selectedTopics, FILTER_VALIDATE_BOOLEAN )){
+                   $allNews = cache('news_tag');
+                    // $allNews = cache('news_newest');
+                    $allNewsCollection = collect($allNews);
+                    
+                    $usedIds = $allNewsCollection
+                    ->take(5) // headerNews
+                    ->merge($allNewsCollection->skip(5)->take(3)) // sideNews
+                    ->merge($allNewsCollection->skip(3)->take(4)) // newNews
+                    ->pluck('id_berita');
+                   // dd($usedIds);
+                     $news =$newsQuery->whereNotIn('id_berita' , $usedIds)->orderByDesc('updated_at')->get()->groupBy('id_kategori_berita')->flatMap(fn($group) => $group->take(4))->values();
+                    
+                     return response()->json([
+                        'data' => new NewsCollection($news),
+                        'meta' => [
+                            'total' => $news->count()
+                        ]
+                    ]);
+                
+                  
                 }
-        });
+  //      });
+       
         $news = $newsQuery->paginate(perPage : $size , page: $pageNews );
        
         $etag = md5(json_encode(
@@ -108,22 +127,15 @@ class NewsController extends Controller
         if($request->header('If-None-Match') === $etag){
             return response()->json(null, 304);
         }
-      return (new NewsCollection($news))->response()->header('ETag', $etag);
-
+    return (new NewsCollection($news))->response()->header('ETag', $etag);
+       
     }
     
     public function storeNews(NewsCreateRequest $request): JsonResponse {
         $data = $request->validated();
         $data['id_berita'] = (String) Str::uuid();
         $data['id_administrator'] = Auth::guard('administrator')->id();
-
-       $news = new berita($data);
-
-        $kategoriBerita = new kategori_berita([
-            'id_kategori_berita' => (string) Str::uuid(),
-            'id_berita' =>  $news->id_berita,
-            'kategori' => $request->kategori
-        ]);
+        $news = new berita($data);
 
         $gambarFields = [
             ['file' => 'gambar' , 'keterangan' =>'keterangan_gambar' , 'posisi_gambar' => 'gambar utama' ],
@@ -142,7 +154,6 @@ class NewsController extends Controller
          'posisi_gambar' => $gf['posisi_gambar']
         ]);
         $news->save();
-        $kategoriBerita->save();
         $gambar_berita->save();
         }
     }
@@ -163,16 +174,13 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
     }
     
     $data = $request->validated();
-
+    $kategori = kategori_berita::where('kategori' , $data['kategori'])->first();
+  //  dd($kategori->id_kategori_berita);
     // Update berita
     $berita->update([
         'judul_berita' => $data['judul_berita'],
         'deks_berita' => $data['deks_berita'],
-    ]);
-
-    // Update kategori berita
-    kategori_berita::where('id_berita', $berita->id_berita)->update([
-        'kategori' => $data['kategori']
+        'id_kategori_berita'=> $kategori->id_kategori_berita
     ]);
 
     // **Cek dan Update Gambar**
@@ -183,7 +191,8 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
 
     $gambarBeritaList = gambar_berita::where('id_berita', $berita->id_berita)
     ->whereIn('posisi_gambar', ['gambar utama', 'gambar opsional'])
-    ->first();
+    ->get();
+
 
     foreach ($gambarFields as $gf) {
         if ($request->hasFile($gf['file'])) {
@@ -336,7 +345,7 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
 
     }
 
-    public function counter($kategori , berita $slugBerita): NewsResource{
+    public function counter(Request $request,  $kategori, berita $slugBerita): NewsResource | JsonResponse{
         if(!$slugBerita) {
             throw new HttpResponseException(response([
                 "errors" => [
@@ -346,8 +355,12 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
                 ]
             ], 404));
         }
+
+         $visitorKey = md5($request->ip() . $request->header('User-Agent'));
+
         $sessionId = session()->getId();
-        $slugBerita->visit()->withSession($sessionId);
+       // $slugBerita->visit()->withSession($sessionId)->withUser()->save();
+       $slugBerita->visit()->withSession($sessionId);
         return new NewsResource($slugBerita);
     }
 
@@ -375,13 +388,60 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
         return new NewsResource($news);
     }
 
-    public function popularNews() : NewsCollection{
-        $berita = berita::popularThisWeek()->get();
-        return new NewsCollection($berita);
+    public function popularNews(Request $request) : NewsCollection|JsonResponse{
+        $query = berita::popularThisWeek();
+        $beritaAll = $query->get();
+
+        $pageNews= $request->input('page', 1);
+        $size = $request->input('size' , 15);
+
+        $etag = $etag = md5(json_encode(
+            [
+                'data' => $beritaAll,
+                'updated_at' => $beritaAll->max('updated_at'),
+            ]
+        ));
+
+        if($request->header('If-None-Match') === $etag) {
+            return response()->json(null, 304);
+        }
+
+        $beritas = $query->paginate(perPage: $size, page:$pageNews);
+        //return (new NewsCollection($news))->response()->header('ETag', $etag);
+      return (new NewsCollection($beritas))->response()->header('ETag' , $etag);
     }
 
-    public function relatedNews() : NewsCollection{
-        
+
+    public function relatedNews(Request $request, $kategori) : NewsCollection|JsonResponse{
+        $pageNews= $request->input('page', 1);
+        $size = $request->input('size' , 15);
+
+        $kategoriBerita = kategori_berita::where('kategori' , $kategori)->first();
+
+        if(!$kategoriBerita) {
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "Berita Tidak Ditemukan"
+                    ]
+                ]
+            ], 401));
+        }
+        $berita = berita::withTrashed()->where('id_kategori_berita' , $kategoriBerita->id_kategori_berita)->orderBy('created_at' , 'desc');
+
+        $beritas = $berita->paginate(perPage: $size, page:$pageNews);
+
+        $etag = md5(json_encode(
+            [
+                'data' => $berita,
+                'updated_at' => $berita->max('updated_at')
+            ]
+        ));
+
+        if($request->header('If-None-Match') === $etag){
+            return response()->json(null, 304);
+        }
+  return (new NewsCollection($beritas))->response()->header('ETag', $etag);
+    //dd($d->headers->all());
     }
-   
 }

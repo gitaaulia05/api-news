@@ -19,7 +19,6 @@ class PenggunaMiddleware
     {
         $token = $request->header('Authorization');
 
-        
         if($token && str_starts_with($token, 'Bearer ')){
             $token = substr($token, 7);
         }
@@ -34,9 +33,7 @@ class PenggunaMiddleware
         if(!$pengguna) {
             $authenticate = false;
         } else {
-            
             Auth::guard('pengguna')->login($pengguna);
-          
         }
 
         if($authenticate){

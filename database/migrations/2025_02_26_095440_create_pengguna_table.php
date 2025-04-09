@@ -17,9 +17,6 @@ return new class extends Migration
             $table->string('nama')->nullable();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('alamat')->nullable();
-            $table->string('provinsi' , 100)->nullable();
-            $table->string('kode_pos')->nullable();
             $table->string('pendidikan_terakhir')->nullable();
             $table->string('pekerjaan' , 155)->nullable();
             $table->string('token')->nullable()->unique();

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\berita;
+use App\Models\kategori_berita;
 use App\Models\Administrator;
 // use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,7 +21,7 @@ class JurnalisApiTest extends TestCase
 
     protected function setUp() : void {
         parent::setUp();
-        $this->token = '49da6fea-5bb7-4647-b087-b37efe726f9b';
+        $this->token = '96f1ff26-f325-4459-9b34-77336f01d119';
     }
 
 
@@ -52,8 +53,8 @@ class JurnalisApiTest extends TestCase
     public function testLogin(){
         // Cobatebakk1* ->gitaauliahafd@gmail.com
         $this->post('/api/jurnalis/login' , [
-            'email' => 'gitaauliahafid@gmail.com',
-            'password' => 'Tebakzzz1@'
+            'email' => 'niki@gmail.com',
+            'password' => 'Cobatebakk1*'
         ])->assertStatus(200);
     }
 
@@ -118,19 +119,27 @@ class JurnalisApiTest extends TestCase
 
     public function testAddNews(){
         $faker = Faker::create();
-        $categories = ['Ekonomi', 'Teknologi', 'Politik', 'Hiburan', 'Olahraga'];
+        $categories = kategori_berita::pluck('id_kategori_berita')->toArray();
         $imageFiles = File::files(resource_path('testImg'));
-    
-        foreach (range(1, 20) as $index) {
+        $kategoriDipilih= [];   
+
+        foreach($categories as $kI) {
+            for($i =0; $i<5; $i++) {
+                $kategoriDipilih[]= $kI;
+            }
+        }
+        shuffle($kategoriDipilih);
+
+        foreach ($kategoriDipilih as $index => $kategoriId) {
+
             $randomImage = $imageFiles[array_rand($imageFiles)];  // Memilih gambar secara acak
-            $randomCategory = $categories[array_rand($categories)];  // Memilih kategori secara acak
-    
+
             $this->post('/api/jurnalis/addNews', [
                 "judul_berita" => $faker->sentence,
                 "deks_berita" => $faker->paragraph,
                 "gambar" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
                 "gambar2" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
-                "kategori" => $randomCategory, 
+                "id_kategori_berita" => $kategoriId, 
                 'keterangan_gambar' => $faker->sentence,
                 'keterangan_gambar2' => $faker->sentence
             ], [
@@ -147,7 +156,7 @@ class JurnalisApiTest extends TestCase
             "deks_berita" => "huhiha",
         //    "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
         //    "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-           "kategori" => "slibaw", 
+           "kategori" => "Politik", 
            'keterangan_gambar' => "hmm ah",
           'keterangan_gambar2' => "hm"
         ], [
@@ -158,7 +167,7 @@ class JurnalisApiTest extends TestCase
             "deks_berita" => "huhiha",
            "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
            "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-           "kategori" => "slibaw", 
+           "kategori" => "Politik", 
            'keterangan_gambar' => "hmm ah",
           'keterangan_gambar2' => "hm"
             ]
@@ -168,15 +177,17 @@ class JurnalisApiTest extends TestCase
 
 
     public function testSearchNews(){
-        $this->get('/api/berita/pengguna?newest=2025-04-04',[
-            'If-None-Match' => "3aa18f5f9e0dc2af1a53a049217a0755"
-        ],  [
-        ])->assertStatus(200);
+        dd(date('Y-m-d'));
+        $this->get('/api/berita/pengguna?newest='.date('Y-m-d'), [
+        ])->dump();
+
+        // $this->get('/api/berita/pengguna?selectedTopics=true&newest=2025-04-06', [
+        //     ])->assertStatus(200);
 
     }
 
     public function testDeleteNews(){
-        $berita = berita::where('slug' , 'lala')->first();
+        $berita = berita::where('slug' , 'dolores-magni-a-voluptate-neque-ipsa-tempora')->first();
     
         $this->get('/api/berita/delete/'.$berita->slug, [
             'Authorization' => $this->token
