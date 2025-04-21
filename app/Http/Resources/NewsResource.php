@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Carbon\Carbon;
+use App\Models\simpanBerita;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,8 +25,8 @@ class NewsResource extends JsonResource
             'is_tayang' => $this->is_tayang,
             'created_at' => $this->created_at,
             'updated_at' => Carbon::parse($this->updated_at)->diffForHumans(),
-            'kategori_berita' => $this->kategori_berita->kategori,
-            'gambar' => $this->gambar_berita->map(function($detail) {
+            'kategori_berita' => $this->berita->kategori_berita->kategori,
+            'gambar' => $this->berita->gambar_berita->map(function($detail) {
                 return [
                     'gambar_berita' => $detail->gambar_berita,
                     'keterangan_gambar' => $detail->keterangan_gambar

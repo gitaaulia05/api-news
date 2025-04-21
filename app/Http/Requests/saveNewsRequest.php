@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PenggunaUpdateRequest extends FormRequest
+class saveNewsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,11 +25,9 @@ class PenggunaUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'alpha'],
-            'alamat' => ['nullable'],
-            'pendidikan_terakhir' => ['nullable'],
-            'pekerjaan' => ['nullable'],
-            'gambar' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
+            'id_pengguna' =>['nullable'],
+            'id_berita' =>['nullable'],
+            'slug' =>['nullable'],
         ];
     }
 
@@ -39,4 +37,3 @@ class PenggunaUpdateRequest extends FormRequest
         ], 400));
     }
 }
-

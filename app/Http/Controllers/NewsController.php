@@ -68,6 +68,7 @@ class NewsController extends Controller
         $Pengguna = Auth::guard('administrator')->user();
 
         $newsQuery = berita::withTrashed();
+        $queryForCache = clone $newsQuery;
 
         $nama = $request->input('judul_berita');
         $newest = $request->input('newest');
@@ -80,21 +81,23 @@ class NewsController extends Controller
                 }
 
                 if($newest !== NULL) {
-                    $hasTodayNews = berita::withTrashed()->where('updated_at', 'like' , '%'. $newest . '%')->exists();
+                    $hasTodayNews = Carbon::parse($newest)->toDateString();
                     $yesterdayNews = Carbon::parse($newest)->subDay()->toDateString();
-                        if(!$hasTodayNews){
-                            $newsQuery->where('updated_at', 'like' , '%'. $yesterdayNews . '%');
-                        } else {
-                            $newsQuery->where('updated_at', 'like' , '%'. $newest . '%')->orWhere('updated_at', 'like' , '%'. $yesterdayNews . '%');
-                        }   
 
-                        cache(['news_tag' => $newsQuery->get()->toArray()]);
+                    $newsQuery->whereDate('updated_at', $hasTodayNews)
+                    ->orWhereDate('updated_at', $yesterdayNews);
                 } 
 
                 if(filter_var($selectedTopics, FILTER_VALIDATE_BOOLEAN )){
-                   $allNews = cache('news_tag');
+                   $cachedNews = cache('news_tag');
+
+                   if (!$cachedNews) {
+                    $cachedNews = $queryForCache->get()->toArray();
+                    cache(['news_tag' => $cachedNews]);
+                }
+
                     // $allNews = cache('news_newest');
-                    $allNewsCollection = collect($allNews);
+                    $allNewsCollection = collect($cachedNews);
                     
                     $usedIds = $allNewsCollection
                     ->take(5) // headerNews
@@ -119,7 +122,8 @@ class NewsController extends Controller
        
         $etag = md5(json_encode(
             [
-                'data' => $news,
+                'page' => $pageNews,
+                'size' => $size,
                 'updated_at' => $newsQuery->max('updated_at'),
             ]
         ));
@@ -390,15 +394,15 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
 
     public function popularNews(Request $request) : NewsCollection|JsonResponse{
         $query = berita::popularThisWeek();
-        $beritaAll = $query->get();
-
         $pageNews= $request->input('page', 1);
         $size = $request->input('size' , 15);
 
+        $updatedAt = $query->max('updated_at');
         $etag = $etag = md5(json_encode(
             [
-                'data' => $beritaAll,
-                'updated_at' => $beritaAll->max('updated_at'),
+                'page' => $pageNews,
+                'size' => $size,
+                'updated_at' => $updatedAt,
             ]
         ));
 
@@ -444,4 +448,7 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
   return (new NewsCollection($beritas))->response()->header('ETag', $etag);
     //dd($d->headers->all());
     }
+
+
+    
 }

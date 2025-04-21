@@ -48,12 +48,14 @@ Route::get('/berita/populer' ,[NewsController::class , 'popularNews']);
  });
 Route::middleware(PenggunaMiddleware::class)->group(function(){
     Route::get("/pengguna/saatIni" , [PenggunaController::class , 'currentPengguna']);
-    Route::patch("/pengguna/{slugPengguna}" , [PenggunaController::class , 'updatePengguna']);
+    Route::post("/pengguna/{slugPengguna}" , [PenggunaController::class , 'updatePengguna']);
+    Route::post('/pengguna/simpanBerita/{slugBerita}' , [PenggunaController::class , 'saveNews']);
+    Route::get('/pengguna/simpanBerita' , [PenggunaController::class , 'getSaveNews']);
+
 
     Route::delete("/pengguna/logout", [PenggunaController::class , 'logout']);
 
     // MAIN  FEATURE
-   
    
 });
 

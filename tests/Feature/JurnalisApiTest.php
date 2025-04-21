@@ -177,12 +177,12 @@ class JurnalisApiTest extends TestCase
 
 
     public function testSearchNews(){
-        dd(date('Y-m-d'));
-        $this->get('/api/berita/pengguna?newest='.date('Y-m-d'), [
-        ])->dump();
+        // dd(date('Y-m-d'));
+        // $this->get('/api/berita/pengguna?newest='.date('Y-m-d'), [
+        // ])->dump();
 
-        // $this->get('/api/berita/pengguna?selectedTopics=true&newest=2025-04-06', [
-        //     ])->assertStatus(200);
+        $this->get('/api/berita/pengguna?selectedTopics=true&newest=2025-04-18', [
+            ])->assertStatus(200);
 
     }
 

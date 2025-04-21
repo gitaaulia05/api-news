@@ -4,11 +4,13 @@ namespace Tests\Feature;
 
 use Log;
 use Tests\TestCase;
-use App\Models\kategori_berita;
 use App\Models\Pengguna;
+use App\Models\kategori_berita;
+use Illuminate\Http\UploadedFile;
 use Database\Seeders\PenggunaSeeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UserApiTest extends TestCase
@@ -21,9 +23,7 @@ class UserApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        //f40d2694-246a-485a-a05f-2c83c63485a2
-        //86767c18-d7e0-490f-b9b2-8ef3aaa7ae19
-       $this->token = 'f40d2694-246a-485a-a05f-2c83c63485a2'; // Inisialisasi token
+       $this->token = 'da50d49b-b0cd-488f-ace5-bd34b3e7c4e6'; // Inisialisasi token
     }
     public function test_example(): void
     {
@@ -78,9 +78,11 @@ class UserApiTest extends TestCase
 
     public function testUpdate(){
        // $this->seed([PenggunaSeeder::class]);
-        $pengguna = Pengguna::query()->limit(1)->first();
-            $this->patch('api/pengguna/'.$pengguna->slug , [
-                "nama" => 'hm'
+       // $pengguna = Pengguna::query()->limit(1)->first();
+       $pengguna= Pengguna::where('slug', 'hm-2')->first();
+            $this->post('api/pengguna/'.$pengguna->slug , [
+                "nama" => 'hm', 
+              // 'gambar' => new UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
             ], [
                 'Authorization' => $this->token,
             ])->assertStatus(200);
@@ -169,4 +171,22 @@ class UserApiTest extends TestCase
       ])->assertStatus(200);
     
     }
+
+
+    public function testSaveNews(){
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->token,
+        ])->post('/api/pengguna/simpanBerita/voluptatem-quis-illum-aut-et');
+        
+        $response->assertStatus(201);
+    }
+
+    public function testGetNews(){
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->token,
+        ])->get('/api/pengguna/simpanBerita');
+        dump($response->json());
+        $response->assertStatus(200);
+    }
+
 }

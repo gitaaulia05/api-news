@@ -6,6 +6,7 @@ use Closure;
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 use Symfony\Component\HttpFoundation\Response;
 
 class PenggunaMiddleware
@@ -30,6 +31,8 @@ class PenggunaMiddleware
         }
 
         $pengguna = Pengguna::where('token' , $token)->first();
+
+
         if(!$pengguna) {
             $authenticate = false;
         } else {
@@ -42,7 +45,7 @@ class PenggunaMiddleware
             return response()->json([
                 "errors" => [
                     "message" => [
-                        "Tidak ter-authentikasi"
+                        "Tidak ter-authentikasi" 
                     ]
                 ]
             ])->setStatusCode(401);

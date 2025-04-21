@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('nama')->nullable();
             $table->string('email')->unique();
+            $table->string('gambar')->nullable();
             $table->string('password');
             $table->string('pendidikan_terakhir')->nullable();
             $table->string('pekerjaan' , 155)->nullable();

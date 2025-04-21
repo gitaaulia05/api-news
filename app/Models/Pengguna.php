@@ -22,6 +22,7 @@ class Pengguna extends Model implements Authenticatable
         'slug',
         'nama',
         'email',
+        'gambar' ,
         'password',
         'pendidikan_terakhir',
         'pekerjaan',

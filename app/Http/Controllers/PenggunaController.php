@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Log;
 use App\Mail\NewsApi;
+use App\Models\berita;
 use App\Models\Pengguna;
 use App\Mail\NewsApiAuth;
 use Illuminate\Support\Str;
+use App\Models\simpanBerita;
+use Illuminate\Http\Request;
 use App\Models\Administrator;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -14,13 +17,16 @@ use App\Models\PasswordResetToken;
 use App\Services\PasswordServices;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\EmailRequest;
+use App\Http\Resources\NewsResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Http\Request;
+use App\Http\Requests\saveNewsRequest;
+use App\Http\Resources\NewsCollection;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\PenggunaResource;
-
 use App\Http\Requests\PenggunaLoginRequest;
 use App\Http\Requests\PenggunaCreateRequest;
 use App\Http\Requests\PenggunaUpdateRequest;
@@ -70,6 +76,79 @@ class PenggunaController extends Controller
         
     }
 
+    public function saveNews(saveNewsRequest $request, $slugBerita) : JsonResponse {
+        $tokenHeader = $request->bearerToken(); 
+        $pengguna = pengguna::where('token', $tokenHeader)->first();
+       
+        $berita = berita::where('slug' , $slugBerita)->first();
+
+        $simpanBerita = simpanBerita::where('slug' , $slugBerita)->where('id_pengguna' , $pengguna->id_pengguna)->exists();
+
+        if(!$pengguna || !$berita){
+            throw new HttpResponseException(response([
+                "errors" =>[
+                    "message" => [
+                        "Pengguna atau Berita Tidak Ditemukan"
+                    ]
+                ]
+            ], 401));
+        }
+
+        if($simpanBerita){
+            throw new HttpResponseException(response([
+                "errors" =>[
+                    "message" => [
+                        "Berita Sudah Tersimpan"
+                    ]
+                ]
+            ], 401));
+        }
+
+        $data = $request->validated();
+        $data['id_pengguna'] = $pengguna->id_pengguna;
+        $data['id_berita'] =$berita->id_berita;
+        $data['slug'] =$berita->slug;
+        $data['id_simpan_berita'] = (String) Str::uuid();
+
+        $saveNews = new simpanBerita($data);
+        $saveNews->save();
+        return response()->json([
+            'data'=> 'Berita Berhasil Disimpan!'
+        ]
+            ,201);
+    }
+
+    public function getSaveNews(Request $request) : NewsCollection{
+        $tokenHeader = $request->bearerToken();
+
+        $pengguna = pengguna::where('token', $tokenHeader)->first(); 
+       
+        $pageNews= $request->input('page', 1);
+        $size = $request->input('size' , 15);
+
+        $judul = $request->input('judul_berita');
+
+        $query = simpanBerita::with([
+            'berita.kategori_berita',
+            'berita.gambar_berita',
+            'berita' => function($q) {
+                $q->withTrashed();
+            }
+        ])
+        ->whereHas('berita', function ($q) use ($judul, $pengguna) {
+            $q->withTrashed(); // ← ini juga penting
+            if ($judul) {
+                $q->where('judul_berita', 'like', '%' . $judul . '%');
+            }
+            $q->where('id_pengguna' , $pengguna->id_pengguna);
+        })
+        ->whereHas('berita.kategori_berita');
+        
+        $news = $query->paginate($size, ['*'], 'page', $pageNews);
+
+        return new NewsCollection($news);
+    }
+
     public function updatePengguna(PenggunaUpdateRequest $request , $slugPengguna) : PenggunaResource {
         $pengguna = Pengguna::where('slug' , $slugPengguna)->first();
         if(!$pengguna){
@@ -82,10 +161,29 @@ class PenggunaController extends Controller
             ])->setStatusCode(404));
         }
 
+        if($request->file('gambar')) {
+            $image =  $request->file('gambar');
+            // simpan gambar ke storeage
+
+            // kalo ada gambar di path hapus
+            if($pengguna->gambar && Storage::disk('public')->exists($pengguna->gambar)){
+                Storage::disk('public')->delete($pengguna->gambar);
+            }
+
+            $path = $request->file('gambar')->store('gambarPengguna' , 'public');
+           $pengguna->gambar = $path;
+        }
+
+        // if(!$request->file('gambar') &&  Storage::disk('public')->exists($pengguna->gambar)) {
+        //     Storage::disk('public')->delete($pengguna->gambar);
+        //     $pengguna->gambar = '';
+        // }    
+
         $data = $request->validated();
+        unset($data['gambar']);
         $pengguna->fill($data);
         $pengguna->save();
-            return ( new PenggunaResource($pengguna));
+            return (new PenggunaResource($pengguna));
     }
 
         public function sendEmail(EmailRequest $request) : JsonResponse {

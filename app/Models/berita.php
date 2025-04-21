@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\berita;
+use App\Models\simpanBerita;
 use Illuminate\Database\Eloquent\Model;
 use Coderflex\Laravisit\Concerns\CanVisit;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -55,6 +56,13 @@ class berita extends Model implements CanVisit
     {
         return $this->hasMany(gambar_berita::class, 'id_berita', 'id_berita');
     }
+
+    
+    public function simpanBerita()
+    {
+        return $this->hasMany(simpanBerita::class, 'id_berita', 'id_berita');
+    }
+
 
     public function getRouteKeyName()
     {
