@@ -52,6 +52,10 @@ class berita extends Model implements CanVisit
     }
 
 
+    public function administrator(){
+        return $this->belongsTo(Administrator::class, 'id_administrator', 'id_administrator');
+    }
+
     public function gambar_berita()
     {
         return $this->hasMany(gambar_berita::class, 'id_berita', 'id_berita');

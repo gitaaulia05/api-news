@@ -21,7 +21,10 @@ class JurnalisApiTest extends TestCase
 
     protected function setUp() : void {
         parent::setUp();
-        $this->token = '96f1ff26-f325-4459-9b34-77336f01d119';
+        // 0fb86a5d-52f4-42cd-89bb-b24343bc3ee0
+       // d09bf6b7-b0a8-4451-8b88-ca9ca2c8a00c
+     //  24afd108-3f07-4bb1-8dd4-32a30d1f5ae6
+        $this->token = '24afd108-3f07-4bb1-8dd4-32a30d1f5ae6';
     }
 
 
@@ -36,14 +39,14 @@ class JurnalisApiTest extends TestCase
     public function testRegister() {
         $this->post('api/jurnalis' , [
             "nama" => "niks",
-            "email" => "niki@gmail.com",
+            "email" => "ulala@gmail.com",
             "password" => "Cobatebakk1*",
             "password_confirmation" => "Cobatebakk1*",
 
         ])->assertStatus(201)->assertJson([
             "data" => [
                 "nama" => "niks",
-                "email" => "niks@gmail.com",
+                "email" => "ulala@gmail.com",
                 "role" => 2,
                 "active" => 0,
             ]
@@ -102,63 +105,64 @@ class JurnalisApiTest extends TestCase
         ])->assertStatus(200);
     }
 
-    // public function testAddNews(){
-    //     $this->post('/api/jurnalis/addNews', [
-    //         "judul_berita" => "lalas",
-    //         "deks_berita" => "hahaha",
-    //        "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-    //        "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-    //        "kategori" => "Teknologi", 
-    //        'keterangan_gambar' => "fmdmdm",
-    //        'keterangan_gambar2' => "fmdmdm"
-    //     ], [
-    //         'Authorization' => $this->token
-    //     ])->assertStatus(201);
-    // }
-
-
     public function testAddNews(){
-        $faker = Faker::create();
-        $categories = kategori_berita::pluck('id_kategori_berita')->toArray();
-        $imageFiles = File::files(resource_path('testImg'));
-        $kategoriDipilih= [];   
-
-        foreach($categories as $kI) {
-            for($i =0; $i<5; $i++) {
-                $kategoriDipilih[]= $kI;
-            }
-        }
-        shuffle($kategoriDipilih);
-
-        foreach ($kategoriDipilih as $index => $kategoriId) {
-
-            $randomImage = $imageFiles[array_rand($imageFiles)];  // Memilih gambar secara acak
-
-            $this->post('/api/jurnalis/addNews', [
-                "judul_berita" => $faker->sentence,
-                "deks_berita" => $faker->paragraph,
-                "gambar" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
-                "gambar2" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
-                "id_kategori_berita" => $kategoriId, 
-                'keterangan_gambar' => $faker->sentence,
-                'keterangan_gambar2' => $faker->sentence
-            ], [
-                'Authorization' => $this->token
-            ])->assertStatus(201);
-        }
+        $this->post('/api/jurnalis/addNews', [
+            "judul_berita" => "lalas",
+            "deks_berita" => "hahaha",
+           "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+           "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+           "id_kategori_berita" => "Teknologi", 
+           'keterangan_gambar' => "fmdmdm",
+           'keterangan_gambar2' => "fmdmdm"
+        ], [
+            'Authorization' => $this->token
+        ])->assertStatus(201);
     }
 
+
+    // public function testAddNews(){
+    //     $faker = Faker::create();
+    //     $categories = kategori_berita::pluck('id_kategori_berita')->toArray();
+    //     $imageFiles = File::files(resource_path('testImg'));
+    //     $kategoriDipilih= [];   
+
+    //     foreach($categories as $kI) {
+    //         for($i =0; $i<5; $i++) {
+    //             $kategoriDipilih[]= $kI;
+    //         }
+    //     }
+    //     shuffle($kategoriDipilih);
+
+    //     foreach ($kategoriDipilih as $index => $kategoriId) {
+
+    //         $randomImage = $imageFiles[array_rand($imageFiles)];  // Memilih gambar secara acak
+
+    //         $this->post('/api/jurnalis/addNews', [
+    //             "judul_berita" => $faker->sentence,
+    //             "deks_berita" => $faker->paragraph,
+    //             "gambar" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
+    //             "gambar2" => new UploadedFile($randomImage, $randomImage->getFilename(), null, null, true),
+    //             "id_kategori_berita" => $kategoriId, 
+    //             'keterangan_gambar' => $faker->sentence,
+    //             'keterangan_gambar2' => $faker->sentence
+    //         ], [
+    //             'Authorization' => $this->token
+    //         ])->assertStatus(201);
+    //     }
+    // }
+
     public function testUpdateNews(){
+
         $berita = berita::where('slug' , 'yaalah')->first();
 
         $this->post('/api/jurnalis/updateNews/'. $berita->slug, [
             "judul_berita" => "yaalah",
             "deks_berita" => "huhiha",
-        //    "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-        //    "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+           "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+            "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
            "kategori" => "Politik", 
            'keterangan_gambar' => "hmm ah",
-          'keterangan_gambar2' => "hm"
+          //'keterangan_gambar2' => "hm"
         ], [
             'Authorization' => $this->token
         ])->assertStatus(200)->assertJson([
@@ -187,20 +191,30 @@ class JurnalisApiTest extends TestCase
     }
 
     public function testDeleteNews(){
-        $berita = berita::where('slug' , 'dolores-magni-a-voluptate-neque-ipsa-tempora')->first();
-    
-        $this->get('/api/berita/delete/'.$berita->slug, [
-            'Authorization' => $this->token
-        ])->assertStatus(200);
+        $berita = berita::withTrashed()->where('slug' , 'aut-ex-voluptatum-itaque-quibusdam-vel-harum-aut')->first();
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->token,
+        ])->post('/api/beritaJurnalis/delete/'.$berita->slug)->assertStatus(200);
+
     }
 
+
+    public function testForceNews(){
+        $berita = berita::withTrashed()->where('slug' , 'lalas')->first();
+        
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->token,
+        ])->post('/api/beritaJurnalis/deleteForce/'.$berita->slug)->assertStatus(200);
+
+    }
     public function testRestoreNews(){
        // $berita = berita::where('slug' , 'hymz')->first();
-       $berita = berita::withTrashed()->where('slug' , 'lala')->first();
+       $berita = berita::withTrashed()->where('slug' , 'aut-ex-voluptatum-itaque-quibusdam-vel-harum-aut')->first();
         //dd($berita);
-        $this->get('/api/berita/restore/'.$berita->slug, [
-            'Authorization' => $this->token
-        ])->assertStatus(200);
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->token,
+        ])->post('/api/beritaJurnalis/restore/'.$berita->slug)->assertStatus(200);
+    
     }
 
     public function testDetailNews() {

@@ -31,9 +31,9 @@ class NewsUpdateRequest extends FormRequest
             'deks_berita' => ['required'],
             'kategori' => ['required' , 'string'],
             'gambar' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
-            'gambar2' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
+            'gambar2' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048' , 'required_with:keterangan_gambar2'],
             'keterangan_gambar' => ['required'],
-            'keterangan_gambar2' => ['nullable'],
+            'keterangan_gambar2' => ['nullable', 'required_with:gambar2'],
         ];
     }
 

@@ -6,8 +6,10 @@ use Log;
 use session;
 use Carbon\Carbon;
 use App\Models\berita;
+use App\Models\Pengguna;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\Administrator;
 use App\Models\gambar_berita;
 use App\Models\kategori_berita;
 use Illuminate\Http\JsonResponse;
@@ -60,14 +62,21 @@ class NewsController extends Controller
     }
 
     public function allNews(Request $request):  NewsCollection | JsonResponse {
-
+        $token = $request->bearerToken();
+        $pengguna = Pengguna::where('token' , $token)->first();
         // dd( Carbon::today()->toDateString());
         $pageNews= $request->input('page', 1);
         $size = $request->input('size' , 15);
 
         $Pengguna = Auth::guard('administrator')->user();
 
-        $newsQuery = berita::withTrashed();
+        $newsQuery = berita::withTrashed()->with(['simpanBerita' => function ($query) use($pengguna) {
+          if($pengguna) {
+            $query->where('id_pengguna' , $pengguna->id_pengguna);
+          }
+        },
+        'administrator']);
+     //   dd($newsQuery);
         $queryForCache = clone $newsQuery;
 
         $nama = $request->input('judul_berita');
@@ -137,6 +146,8 @@ class NewsController extends Controller
     
     public function storeNews(NewsCreateRequest $request): JsonResponse {
         $data = $request->validated();
+        $kategoriBerita = kategori_berita::where('kategori' , $data['id_kategori_berita'])->first();
+        $data['id_kategori_berita'] = $kategoriBerita->id_kategori_berita;
         $data['id_berita'] = (String) Str::uuid();
         $data['id_administrator'] = Auth::guard('administrator')->id();
         $news = new berita($data);
@@ -145,6 +156,7 @@ class NewsController extends Controller
             ['file' => 'gambar' , 'keterangan' =>'keterangan_gambar' , 'posisi_gambar' => 'gambar utama' ],
             ['file' => 'gambar2' , 'keterangan' =>'keterangan_gambar2',  'posisi_gambar' => 'gambar tambahan']      
     ];
+
 
     foreach($gambarFields as $gf){
         if($request->hasFile($gf['file'])) {
@@ -262,13 +274,24 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
         return new NewsResource($news);
     }
 
-    public function softDelete($slugBerita) : JsonResponse
+    public function softDelete(Request $request, $slugBerita) : JsonResponse
     {
-        $jurnalis = Auth::guard('administrator')->user();
+       $token = $request->bearerToken();
+        $query = berita::withTrashed()->where('slug' , $slugBerita);
+
+
+        $isJurnalis = Administrator::where('token' , $token)->first();
+
+        if($isJurnalis->role == 2){
+            $query->where("slug" , $slugBerita)->whereHas('administrator' , function($q) use ($token){
+                $q->where('token' , $token);
+            });
+        }
       
-        $news = berita::withTrashed()->where("slug" , $slugBerita)->first();
-        // ->where('id_administrator' , $jurnalis->id_administrator )-
-        if(!$news){
+        $news = $query->first();
+
+        
+        if(!$news || !$isJurnalis ){
             throw new HttpResponseException(response([
                 "errors" => [
                     "message" => [
@@ -278,6 +301,17 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
                 ]
             ], 401));
         }
+
+        if(empty($news->slug)) {
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "Berita Harus Hapus 30 Hari Terlebih Dahuluh"
+                    ]
+                ]
+            ], 401));
+        }
+
 
         $news->update([
             'is_tayang' => '2'
@@ -301,12 +335,22 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
         return new NewsCollection($news);
     }
 
-    public function restoreNews($slugBerita) : JsonResponse {
-        $jurnalis = Auth::guard('administrator')->user();
+    public function restoreNews(Request $request, $slugBerita) : JsonResponse {
+        $token = $request->bearerToken();
 
-        $news = berita::onlyTrashed()->where('slug' , $slugBerita)->where('id_administrator' , $jurnalis->id_administrator)->first();
-        
-        if(!$news){
+        $news = berita::onlyTrashed()->where('slug' , $slugBerita)->first();
+
+        $isJurnalis = Administrator::where('token' , $token)->first();
+       
+        if($isJurnalis->role == 2){
+            $news->where("slug" , $slugBerita)->whereHas('administrator' , function($q) use ($token){
+                $q->where('token' , $token);
+            });
+        }
+
+      
+
+        if(!$news || !$isJurnalis){
             throw new HttpResponseException(response([
                 "errors" => [
                     "message" => [
@@ -316,6 +360,16 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
             ], 401));
         }
 
+
+        if(empty($news->slug)) {
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "Berita Harus Hapus 30 Hari Terlebih Dahulu"
+                    ]
+                ]
+            ], 401));
+        }
         $news->update([
             'is_tayang' => '1'
         ]);
@@ -328,19 +382,42 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
             ])->setStatusCode(200);
     }
 
-    public function delete($slugBerita) : JsonResponse {
-        $jurnalis = Auth::guard('administrator')->user();
-        $berita = berita::onlyTrashed()->where('slug' , $slugBerita)->where('id_administrator' , $jurnalis->id_administrator)->first();
+    public function delete(Request $request,$slugBerita) : JsonResponse {
+
+        $token = $request->bearerToken();
+
+        $berita = berita::onlyTrashed()->where('slug' , $slugBerita)->first();
+    
+      
+        $isJurnalis = Administrator::where('token' , $token)->first();
+
+       
+        if($isJurnalis->role == 2){
+            $berita->where("slug" , $slugBerita)->whereHas('administrator' , function($q) use ($token){
+                $q->where('token' , $token);
+            });
+        }
+    
+        if(empty($berita->slug)) {
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "Berita Harus Hapus 30 Hari Terlebih Dahulu"
+                    ]
+                ]
+            ], 401));
+        }
 
         if(!$berita) {
             throw new HttpResponseException(response([
                 "errors" => [
                     "message" => [
-                        "Berita Tidak Ditemukan"
+                        "Berita Tidak Ditemukan!"
                     ]
                 ]
             ], 401));
         }
+
 
         $berita->forceDelete();
         return response()->json([

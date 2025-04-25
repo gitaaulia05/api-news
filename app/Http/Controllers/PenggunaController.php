@@ -122,7 +122,7 @@ class PenggunaController extends Controller
         $tokenHeader = $request->bearerToken();
 
         $pengguna = pengguna::where('token', $tokenHeader)->first(); 
-       
+     
         $pageNews= $request->input('page', 1);
         $size = $request->input('size' , 15);
 
@@ -147,6 +147,28 @@ class PenggunaController extends Controller
         $news = $query->paginate($size, ['*'], 'page', $pageNews);
 
         return new NewsCollection($news);
+    }
+
+    public function deleteNews(Request $request, $slugBerita) : JsonResponse{
+        $token = $request->bearerToken();
+        $pengguna = Pengguna::where('token' , $token)->first();
+        
+        $simpanBerita = simpanBerita::where('slug' , $slugBerita)->where('id_pengguna' , $pengguna->id_pengguna)->first();
+
+        if(!$simpanBerita) {
+            throw new HttpResponseException(response()->json([
+                'errors'=>[
+                    "message" => [
+                        "Berita Tidak Ditemukan"
+                    ]
+                ]
+            ])->setStatusCode(404));
+        }
+        $simpanBerita->delete();
+
+        return response()->json([
+            "data" => true
+        ])->setStatusCode(200);
     }
 
     public function updatePengguna(PenggunaUpdateRequest $request , $slugPengguna) : PenggunaResource {

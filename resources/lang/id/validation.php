@@ -146,7 +146,4 @@ return [
     |
     */
 
-    'attributes' => [
-        'id_kategori_berita' => 'Jumlah Buku',
-    ],
 ];

@@ -1,14 +1,13 @@
 <?php
 
 namespace App\Http\Middleware;
-
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class UniversalMiddleware
+class JurnalisActiveMiddleware
 {
     /**
      * Handle an incoming request.
@@ -30,7 +29,7 @@ class UniversalMiddleware
             $authenticate = false;
         }
 
-        $jurnalis = Administrator::where('token' , $tokenJurnal)->where('role' , 2)->where('active' , 1)->first() ?? Administrator::where('token' , $tokenJurnal)->where('role' , 1)->where('active' , 1)->first();
+        $jurnalis = Administrator::where('token' , $tokenJurnal)->where('role' , 2)->where('active' , 1)->first() ;
        
         if(!$jurnalis ){
             $authenticate = false;
@@ -44,10 +43,11 @@ class UniversalMiddleware
             return response()->json([
                 "errors" => [
                     "message" => [
-                        "Tidak Ter-authentikasi"
+                        "Anda Tidak Memiliki Akses"
                     ]
                 ]
             ])->setStatusCode(401);
         }
+    
     }
 }

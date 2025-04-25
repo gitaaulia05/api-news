@@ -23,7 +23,7 @@ class UserApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-       $this->token = 'da50d49b-b0cd-488f-ace5-bd34b3e7c4e6'; // Inisialisasi token
+       $this->token = '43e1781a-f1b7-416a-8631-e21370535600'; // Inisialisasi token
     }
     public function test_example(): void
     {
@@ -186,6 +186,13 @@ class UserApiTest extends TestCase
             'Authorization' => 'Bearer '.$this->token,
         ])->get('/api/pengguna/simpanBerita');
         dump($response->json());
+        $response->assertStatus(200);
+    }
+
+    public function testDeleteSaveNews(){
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->token,
+        ])->delete('/api/pengguna/hapusSimpanBerita/voluptatem-quis-illum-aut-et');
         $response->assertStatus(200);
     }
 

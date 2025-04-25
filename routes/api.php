@@ -10,6 +10,8 @@ use App\Http\Middleware\JurnalisMiddleware;
 use App\Http\Middleware\PenggunaMiddleware;
 use App\Http\Controllers\JurnalisController;
 use App\Http\Controllers\PenggunaController;
+use App\Http\Middleware\UniversalMiddleware;
+use App\Http\Middleware\JurnalisActiveMiddleware;
 
                 //ROUTE PENGGUNA
 Route::post("/pengguna" , [PenggunaController::class , 'index']);
@@ -51,10 +53,9 @@ Route::middleware(PenggunaMiddleware::class)->group(function(){
     Route::post("/pengguna/{slugPengguna}" , [PenggunaController::class , 'updatePengguna']);
     Route::post('/pengguna/simpanBerita/{slugBerita}' , [PenggunaController::class , 'saveNews']);
     Route::get('/pengguna/simpanBerita' , [PenggunaController::class , 'getSaveNews']);
-
+    Route::delete('/pengguna/hapusSimpanBerita/{slugBerita}' , [PenggunaController::class , 'deleteNews']);
 
     Route::delete("/pengguna/logout", [PenggunaController::class , 'logout']);
-
     // MAIN  FEATURE
    
 });
@@ -88,22 +89,26 @@ Route::middleware(JurnalisMiddleware::class)->group(function () {
     Route::get('/jurnalis/{slugAdmin}' , [AdminController::class , 'showData'] );
     Route::delete('/jurnalis/logout' , [AdminController::class , 'logout']);
 
-    // MAIN FEATURE
-    Route::post('/jurnalis/addNews' , [NewsController::class , 'storeNews']);
-    Route::post('/jurnalis/updateNews/{slugBerita}' ,[NewsController::class , 'updateNews'] );
-    Route::get('/berita', [NewsController::class , 'index']);
-    Route::get('/jurnalis/berita/{slugBerita}',[NewsController::class , 'showNews']);
+    Route::middleware(JurnalisActiveMiddleware::class)->group(function(){
+     // MAIN FEATURE
+        Route::post('/jurnalis/addNews' , [NewsController::class , 'storeNews']);
+        Route::post('/jurnalis/updateNews/{slugBerita}' ,[NewsController::class , 'updateNews'] );
+        Route::get('/berita', [NewsController::class , 'index']);
+        Route::get('/jurnalis/berita/{slugBerita}',[NewsController::class , 'showNews']);
+    });
+  
+});
+
+Route::middleware(UniversalMiddleware::class)->group(function(){
+     // SOFT DELETE
+     Route::post('/beritaJurnalis/delete/{slugBerita}' ,[NewsController::class , 'softDelete']);
     
-    // SOFT DELETE
-    Route::get('/berita/delete/{slugBerita}' ,[NewsController::class , 'softDelete']);
-    
-    //lihat tong sampah
-    Route::get('/berita/tong-sampah' ,[NewsController::class , 'trashBin']);
-
-    //Hapus Permanen
-    Route::get('/berita/deleteForce/{slugBerita}' , [NewsController::class , 'delete']);
-
-    // restore data
-    Route::get('/berita/restore/{slugBerita}' , [NewsController::class , 'restoreNews']);
-
+     //lihat tong sampah
+     Route::get('/beritaJurnalis/tong-sampah' ,[NewsController::class , 'trashBin']);
+ 
+     //Hapus Permanen
+     Route::post('/beritaJurnalis/deleteForce/{slugBerita}' , [NewsController::class , 'delete']);
+ 
+     // restore data
+     Route::post('/beritaJurnalis/restore/{slugBerita}' , [NewsController::class , 'restoreNews']);
 });
