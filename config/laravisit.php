@@ -13,4 +13,5 @@ return [
     |
     */
     'user_namespace' => "\Coderflex\Laravisit\Models\User",
+    'ignore_bots' => false,
 ];

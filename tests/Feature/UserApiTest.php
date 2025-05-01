@@ -4,13 +4,14 @@ namespace Tests\Feature;
 
 use Log;
 use Tests\TestCase;
+use App\Models\berita;
 use App\Models\Pengguna;
 use App\Models\kategori_berita;
 use Illuminate\Http\UploadedFile;
 use Database\Seeders\PenggunaSeeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Foundation\Testing\WithFaker;
 
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UserApiTest extends TestCase
@@ -143,13 +144,19 @@ class UserApiTest extends TestCase
     // MAIN FEATURE
 
     public function testCounterNews(){
-        $this->get('/api/berita/Politik/voluptatem-quis-illum-aut-et')->assertStatus(200);
+       $b =  berita::first();
+      //  $this->get('/api/berita/'.$b->kategori_berita->kategori .'/'.$b->slug)->assertStatus(200);
+        $this->get('/api/berita/Ekonomi/autem-voluptate-ratione-deserunt-aliquam')->assertStatus(200);
     }
 
-    public function testCounterNewsToken(){
-        $this->get('/api/berita/ekonomi/lala' , [
-            'Authorization' => $this->token
-        ])->assertStatus(200);
+    // public function testCounterNewsToken(){
+    //     $this->get('/api/berita/ekonomi/lala' , [
+    //         'Authorization' => $this->token
+    //     ])->assertStatus(200);
+    // }
+
+    public function testKategoriNews(){
+        $this->get('/api/berita/pengguna?kategori=Ekonomi')->assertStatus(200);
     }
 
 

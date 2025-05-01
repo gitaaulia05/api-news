@@ -24,7 +24,7 @@ class JurnalisApiTest extends TestCase
         // 0fb86a5d-52f4-42cd-89bb-b24343bc3ee0
        // d09bf6b7-b0a8-4451-8b88-ca9ca2c8a00c
      //  24afd108-3f07-4bb1-8dd4-32a30d1f5ae6
-        $this->token = '24afd108-3f07-4bb1-8dd4-32a30d1f5ae6';
+        $this->token = 'e32bba72-c4dc-4608-a258-b9e358365bfb';
     }
 
 

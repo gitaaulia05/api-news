@@ -24,12 +24,11 @@ Route::post("/pengguna/token-check/{token}" , [PenggunaController::class , 'chec
             //edit pass fineal
 Route::patch("/lupa-password/{token}" , [PenggunaController::class , 'forgetPassword']);
 
+
 Route::get('/berita/pengguna', [NewsController::class , 'allNews']);
 
 // Counter visitor
-Route::get('/berita/{kategori}/{slugBerita}', [NewsController::class , 'counter']);
-// Route::middleware(['web'])->get('/berita/{kategori}/{slug}', [BeritaController::class, 'counter']);
-
+Route::get('/berita/{kategori}/{slug}', [NewsController::class , 'counter']);
 
 // popular news this weeks
 Route::get('/berita/populer' ,[NewsController::class , 'popularNews']);
@@ -54,7 +53,6 @@ Route::middleware(PenggunaMiddleware::class)->group(function(){
     Route::post('/pengguna/simpanBerita/{slugBerita}' , [PenggunaController::class , 'saveNews']);
     Route::get('/pengguna/simpanBerita' , [PenggunaController::class , 'getSaveNews']);
     Route::delete('/pengguna/hapusSimpanBerita/{slugBerita}' , [PenggunaController::class , 'deleteNews']);
-
     Route::delete("/pengguna/logout", [PenggunaController::class , 'logout']);
     // MAIN  FEATURE
    
@@ -80,10 +78,10 @@ Route::middleware(AdminMiddleware::class)->group(function () {
 //          ROUTE JURNALIS
 Route::post('/jurnalis/login' , [JurnalisController::class , 'login']);
 Route::post('/jurnalis' , [JurnalisController::class , 'register']);
+Route::post('/jurnalis/register' , [JurnalisController::class , 'register']);
+
 
 Route::middleware(JurnalisMiddleware::class)->group(function () {
-    Route::post('/jurnalis/register' , [JurnalisController::class , 'register']);
-    
     Route::get('/jurnalis' , [AdminController::class , 'currentAdmin']);
     Route::post('/jurnalis/update/{slugAdmin}' , [AdminController::class , 'updateData']);
     Route::get('/jurnalis/{slugAdmin}' , [AdminController::class , 'showData'] );

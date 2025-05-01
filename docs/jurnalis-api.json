@@ -1,0 +1,662 @@
+{
+    "openapi":"3.0.3",
+    "info": {
+      "title":"Jurnalis API",
+      "description":"Jurnalis API",
+      "version":"1.0"
+    },
+    "servers": [
+      {"url":"https://api.server.test/v1"}
+    ],
+    "paths": {
+        "/jurnalis": {
+            "get": {
+            
+              "description": "Mengambil informasi jurnalis yang sedang login",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Data jurnalis berhasil diambil",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "nama": {
+                                "type": "string"
+                              },
+                              "email": {
+                                "type": "string",
+                                "format": "email"
+                              },
+                              "slug": {
+                                "type": "string"
+                              },
+                              "gambar": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "URL gambar admin"
+                              },
+                              "token": {
+                                "type": "string"
+                              },
+                              "role": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+         },
+         "/jurnalis/update/{slugAdmin}": {
+            "get": {
+            
+              "description": "Mengambil detail informasi jurnalis yang sedang login",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Data jurnalis berhasil diambil",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "nama": {
+                                "type": "string"
+                              },
+                              "email": {
+                                "type": "string",
+                                "format": "email"
+                              },
+                              "slug": {
+                                "type": "string"
+                              },
+                              "gambar": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "URL gambar admin"
+                              },
+                              "token": {
+                                "type": "string"
+                              },
+                              "role": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+         },
+         "/jurnalis/logout": {
+            "delete": {
+              "description": "Logout Akun Administrator",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Data Detail Akun Jurnalis berhasil Diambil",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                             "type":"boolean"
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/jurnalis/addNews": {
+            "post": {
+              "description": "Tambah Data Berita",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "201": {
+                  "description": "Tambah Data Berita Berhasil Dilakukan",
+                  "content": {
+                    "application/json": {
+                      "examples": {
+                        "Olahraga":{
+                            "description": "Tambah Data Berita",
+                            "value":{
+                                "judul_berita":"Indonesia lolos kualifikasi piala dunia",
+                                "deks_berita":"Indonesia lolos kualifikasi piala dunia 2030",
+                                "kategori_berita":"Olahraga",
+                                "gambar": [
+                                  {
+                                    "gambar_berita": "https://example.com/gambar1.jpg",
+                                    "keterangan_gambar": "Timnas Indonesia merayakan kemenangan"
+                                  },
+                                  {
+                                    "gambar_berita": "https://example.com/gambar2.jpg",
+                                    "keterangan_gambar": "Suasana stadion saat pertandingan"
+                                  }
+                                ]
+                            }
+                        }
+                    },
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                             "data": {
+                            "type":"object",
+                            "properties":{
+                                "id_administrator":{
+                                    "type":"string"
+                                },
+                                "nama_jurnalis":{
+                                    "type":"string"
+                                },
+                                "slug":{
+                                    "type":"string"
+                                },
+                                "judul_berita":{
+                                    "type":"string"
+                                },
+                                "deks_berita":{
+                                    "type":"string"
+                                },
+                                "is_tayang":{
+                                    "type":"boolean"
+                                },
+                                "created_at":{
+                                    "type":"string"
+                                },
+                                "simpanBerita":{
+                                    "type":"string"
+                                },
+                                "updated_at":{
+                                    "type":"string"
+                                },
+                                "kategori_berita":{
+                                    "type":"string"
+                                },
+                                "gambar":{
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gambar_berita": {
+                                          "type": "string",
+                                          "description": "URL atau path gambar"
+                                        },
+                                        "keterangan_gambar": {
+                                          "type": "string",
+                                          "description": "Deskripsi atau keterangan dari gambar"
+                                        }
+                                      }
+                                    }
+                                }
+                            }
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/jurnalis/updateNews/{slugBerita}": {
+            "post": {
+              "description": "Update Data Berita",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Update Berita Berhasil Dilakukan",
+                  "content": {
+                    "application/json": {
+                      "examples": {
+                        "Olahraga":{
+                            "description": "Update Data Berita",
+                            "value":{
+                                "judul_berita":"Indonesia lolos kualifikasi piala dunia",
+                                "deks_berita":"Indonesia lolos kualifikasi piala dunia 2030",
+                                "kategori_berita":"Olahraga",
+                                "gambar": [
+                                  {
+                                    "gambar_berita": "https://example.com/gambar1.jpg",
+                                    "keterangan_gambar": "Timnas Indonesia merayakan kemenangan"
+                                  },
+                                  {
+                                    "gambar_berita": "https://example.com/gambar2.jpg",
+                                    "keterangan_gambar": "Suasana stadion saat pertandingan"
+                                  }
+                                ]
+                            }
+                        }
+                    },
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                             "data": {
+                            "type":"object",
+                            "properties":{
+                                "id_administrator":{
+                                    "type":"string"
+                                },
+                                "nama_jurnalis":{
+                                    "type":"string"
+                                },
+                                "slug":{
+                                    "type":"string"
+                                },
+                                "judul_berita":{
+                                    "type":"string"
+                                },
+                                "deks_berita":{
+                                    "type":"string"
+                                },
+                                "is_tayang":{
+                                    "type":"boolean"
+                                },
+                                "created_at":{
+                                    "type":"string"
+                                },
+                                "simpanBerita":{
+                                    "type":"string"
+                                },
+                                "updated_at":{
+                                    "type":"string"
+                                },
+                                "kategori_berita":{
+                                    "type":"string"
+                                },
+                                "gambar":{
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gambar_berita": {
+                                          "type": "string",
+                                          "description": "URL atau path gambar"
+                                        },
+                                        "keterangan_gambar": {
+                                          "type": "string",
+                                          "description": "Deskripsi atau keterangan dari gambar"
+                                        }
+                                      }
+                                    }
+                                }
+                            }
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/jurnalis/berita/{slugBerita}": {
+            "get": {
+              "description": "Detail Berita",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Detail Data Berita berhasil diambil",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                             "data": {
+                            "type":"object",
+                            "properties":{
+                                "id_administrator":{
+                                    "type":"string"
+                                },
+                                "nama_jurnalis":{
+                                    "type":"string"
+                                },
+                                "slug":{
+                                    "type":"string"
+                                },
+                                "judul_berita":{
+                                    "type":"string"
+                                },
+                                "deks_berita":{
+                                    "type":"string"
+                                },
+                                "is_tayang":{
+                                    "type":"boolean"
+                                },
+                                "created_at":{
+                                    "type":"string"
+                                },
+                                "simpanBerita":{
+                                    "type":"string"
+                                },
+                                "updated_at":{
+                                    "type":"string"
+                                },
+                                "kategori_berita":{
+                                    "type":"string"
+                                },
+                                "gambar":{
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gambar_berita": {
+                                          "type": "string",
+                                          "description": "URL atau path gambar"
+                                        },
+                                        "keterangan_gambar": {
+                                          "type": "string",
+                                          "description": "Deskripsi atau keterangan dari gambar"
+                                        }
+                                      }
+                                    }
+                                }
+                            }
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/beritaJurnalis/delete/{slugBerita}": {
+            "post": {
+              "description": "Hapus Berita dan Dapat di Recovery",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Detail Data Berita berhasil dihapus dan dapat direcovery",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                             "data": {
+                                "type" :"boolean"
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/beritaJurnalis/tong-sampah": {
+            "get": {
+              "description": "Data Berita yang Terhapus",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Data Berita  Terhapus Berhasil Diambil",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                             "data": {
+                            "type":"object",
+                            "properties":{
+                                "id_administrator":{
+                                    "type":"string"
+                                },
+                                "nama_jurnalis":{
+                                    "type":"string"
+                                },
+                                "slug":{
+                                    "type":"string"
+                                },
+                                "judul_berita":{
+                                    "type":"string"
+                                },
+                                "deks_berita":{
+                                    "type":"string"
+                                },
+                                "is_tayang":{
+                                    "type":"boolean"
+                                },
+                                "created_at":{
+                                    "type":"string"
+                                },
+                                "simpanBerita":{
+                                    "type":"string"
+                                },
+                                "updated_at":{
+                                    "type":"string"
+                                },
+                                "kategori_berita":{
+                                    "type":"string"
+                                },
+                                "gambar":{
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gambar_berita": {
+                                          "type": "string",
+                                          "description": "URL atau path gambar"
+                                        },
+                                        "keterangan_gambar": {
+                                          "type": "string",
+                                          "description": "Deskripsi atau keterangan dari gambar"
+                                        }
+                                      }
+                                    }
+                                }
+                            }
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/beritaJurnalis/deleteForce/{slugBerita}": {
+            "post": {
+              "description": "Hapus Permanen Berita",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Data Berita berhasil Dihapus",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                             "data": {
+                                "type" : "boolean"
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/beritaJurnalis/restore/{slugBerita}": {
+            "post": {
+              "description": "Recovery Data Berita yang terhapus",
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  },
+                  "description": "Bearer token untuk autentikasi"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Data Berita Terhapus Berhasil Di Recovery",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                             "data": {
+                                "type" : "boolean"
+                          },
+                          "errors": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        }
+
+
+
+    }
+}

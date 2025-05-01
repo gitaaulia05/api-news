@@ -376,7 +376,7 @@ class PenggunaController extends Controller
     public function storeNewPassword(PenggunaForgetPassRequest $request , $token) : JsonResponse {
         $tokenHeader = $request->header('Authorization'); 
 
-        if($tokenHeader && str_starts_with($tokenHeader, 'Bearer ')){
+    if($tokenHeader && str_starts_with($tokenHeader, 'Bearer ')){
             $tokenHeader = substr($tokenHeader, 7);
         }
         $password= PasswordResetToken::where('token' , $token)->first();

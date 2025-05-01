@@ -82,10 +82,11 @@ class NewsController extends Controller
         $nama = $request->input('judul_berita');
         $newest = $request->input('newest');
         $selectedTopics = $request->input('selectedTopics');
-
+        $kategori = $request->input('kategori');
         // $newsQuery->where(function (Builder $query) use ($nama , $newest, $selectedTopics,) {
           
                 if($nama) {
+                    dd($nama);
                     $newsQuery->where('judul_berita' , 'like' , '%'.$nama.'%');
                 }
 
@@ -122,10 +123,13 @@ class NewsController extends Controller
                             'total' => $news->count()
                         ]
                     ]);
-                
-                  
-                }
-  //      });
+    }
+
+    if($kategori) {
+        $newsQuery->whereHas('kategori_berita', function($query) use ($kategori){
+            $query->where('kategori' , $kategori);
+        });
+      }
        
         $news = $newsQuery->paginate(perPage : $size , page: $pageNews );
        
@@ -426,8 +430,8 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
 
     }
 
-    public function counter(Request $request,  $kategori, berita $slugBerita): NewsResource | JsonResponse{
-        if(!$slugBerita) {
+    public function counter(Request $request,  $kategori, berita $slug): NewsResource | JsonResponse{
+        if(!$slug || !$slug->exists) {
             throw new HttpResponseException(response([
                 "errors" => [
                     "message" => [
@@ -436,20 +440,14 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
                 ]
             ], 404));
         }
-
-         $visitorKey = md5($request->ip() . $request->header('User-Agent'));
-
-        $sessionId = session()->getId();
-       // $slugBerita->visit()->withSession($sessionId)->withUser()->save();
-       $slugBerita->visit()->withSession($sessionId);
-        return new NewsResource($slugBerita);
+        $visitorKey = md5($request->ip() .$request->userAgent());
+        $slug->visit($visitorKey)->withIp($request->ip());
+            return new NewsResource($slug);
     }
 
     public function showNew($slugBerita) : NewsResource
     {
-        
         $admin = Auth::guard('administrator')->user();
-
         $query = berita::withTrashed("slug" , $slugBerita)->first();
         if($admin->role == 2){
            $query->where('id_administrator' , $admin->id_administrator);

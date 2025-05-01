@@ -350,6 +350,124 @@
                     }
                 }
             }
+        },
+        "api/pengguna/simpanBerita/{slugBerita}":{
+            "post":{
+                "description":"Save News To Users Profile",
+                "parameters":[
+                   {
+                    "nama": "Authorization",
+                    "in" :"header"
+                   }
+                ],
+                "responses":{
+                   "200":{
+                         "description":"Berhasil Simpan Data",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "id_administrator":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama_jurnalis":{
+                                                        "type":"string"
+                                                    },
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "judul_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "deks_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "is_tayang":{
+                                                        "type":"boolean"
+                                                    },
+                                                    "created_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "simpanBerita":{
+                                                        "type":"string"
+                                                    },
+                                                    "updated_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "kategori_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "gambar":{
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "gambar_berita": {
+                                                              "type": "string",
+                                                              "description": "URL atau path gambar"
+                                                            },
+                                                            "keterangan_gambar": {
+                                                              "type": "string",
+                                                              "description": "Deskripsi atau keterangan dari gambar"
+                                                            }
+                                                          }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+    
+                    }
+                }
+            }
+        },
+        "api/pengguna/pengguna/hapusSimpanBerita/{slugBerita}":{
+            "delete":{
+                "description":"Logout Current User",
+                "parameters":[
+                   {
+                    "nama": "Authorization",
+                    "in" :"header"
+                   }
+                ],
+                "responses":{
+                   "200":{
+                         "description":"Berhasil Hapus Simpan Berita",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"boolean"   
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
         }
+     
     }
+  
   }

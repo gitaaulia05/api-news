@@ -1,0 +1,318 @@
+{
+    "openapi":"3.0.3",
+    "info": {
+      "title":"Chaneg Password Api",
+      "description":"Chaneg Password Api",
+      "version":"1.0"
+    },
+    "servers": [
+      {"url":"https://api.server.test/v1"}
+    ],
+    "paths": {
+        "/berita/pengguna":{
+            "get":{
+                "description":"Menampilkan Seluruh data berita beserta tambahan parameters untuk search berita.",
+                "responses":{
+                   "200":{
+                         "description":"Berhasil Menampilkan seluruh data berita",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "id_administrator":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama_jurnalis":{
+                                                        "type":"string"
+                                                    },
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "judul_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "deks_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "is_tayang":{
+                                                        "type":"boolean"
+                                                    },
+                                                    "created_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "simpanBerita":{
+                                                        "type":"string"
+                                                    },
+                                                    "updated_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "kategori_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "gambar":{
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "gambar_berita": {
+                                                              "type": "string",
+                                                              "description": "URL atau path gambar"
+                                                            },
+                                                            "keterangan_gambar": {
+                                                              "type": "string",
+                                                              "description": "Deskripsi atau keterangan dari gambar"
+                                                            }
+                                                          }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+    
+                    }
+                }
+            }
+        },
+        "/berita/{kategori}/{slug}":{
+            "get":{
+                "description":"Menampilkan Detail Berita serta menghitung total Pengunjung berita tersebut",
+                "responses":{
+                   "200":{
+                         "description":"Berhasil Menampilkan detail data berita",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "id_administrator":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama_jurnalis":{
+                                                        "type":"string"
+                                                    },
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "judul_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "deks_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "is_tayang":{
+                                                        "type":"boolean"
+                                                    },
+                                                    "created_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "simpanBerita":{
+                                                        "type":"string"
+                                                    },
+                                                    "updated_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "kategori_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "gambar":{
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "gambar_berita": {
+                                                              "type": "string",
+                                                              "description": "URL atau path gambar"
+                                                            },
+                                                            "keterangan_gambar": {
+                                                              "type": "string",
+                                                              "description": "Deskripsi atau keterangan dari gambar"
+                                                            }
+                                                          }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+    
+                    }
+                }
+            }
+        },
+        "/berita/populer":{
+            "get":{
+                "description":"Data Berita terpopluer berdasarkan banyaknya pengunjung",
+                "responses":{
+                   "200":{
+                         "description":"Berhasil Menampilkan data berita terpopuler",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "id_administrator":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama_jurnalis":{
+                                                        "type":"string"
+                                                    },
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "judul_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "deks_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "is_tayang":{
+                                                        "type":"boolean"
+                                                    },
+                                                    "created_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "simpanBerita":{
+                                                        "type":"string"
+                                                    },
+                                                    "updated_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "kategori_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "gambar":{
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "gambar_berita": {
+                                                              "type": "string",
+                                                              "description": "URL atau path gambar"
+                                                            },
+                                                            "keterangan_gambar": {
+                                                              "type": "string",
+                                                              "description": "Deskripsi atau keterangan dari gambar"
+                                                            }
+                                                          }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+    
+                    }
+                }
+            }
+        },
+        "/news/related/{kategori}":{
+            "get":{
+                "description":"Menampilkan berita rekomendasi berdasarkan kategori",
+                "responses":{
+                   "200":{
+                         "description":"Berhasil Menampilkan data berita",
+                        "content":{
+                            "application/json":{
+                               
+                                "schema":{
+                                    "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "id_administrator":{
+                                                        "type":"string"
+                                                    },
+                                                    "nama_jurnalis":{
+                                                        "type":"string"
+                                                    },
+                                                    "slug":{
+                                                        "type":"string"
+                                                    },
+                                                    "judul_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "deks_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "is_tayang":{
+                                                        "type":"boolean"
+                                                    },
+                                                    "created_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "simpanBerita":{
+                                                        "type":"string"
+                                                    },
+                                                    "updated_at":{
+                                                        "type":"string"
+                                                    },
+                                                    "kategori_berita":{
+                                                        "type":"string"
+                                                    },
+                                                    "gambar":{
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "gambar_berita": {
+                                                              "type": "string",
+                                                              "description": "URL atau path gambar"
+                                                            },
+                                                            "keterangan_gambar": {
+                                                              "type": "string",
+                                                              "description": "Deskripsi atau keterangan dari gambar"
+                                                            }
+                                                          }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                }
+                            }
+                        }
+    
+                    }
+                }
+            }
+        }
+    
+    }
+}
