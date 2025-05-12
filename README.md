@@ -78,8 +78,6 @@ _Ikuti langkah-langkah berikut untuk menginstal dan menjalankan aplikasi secara 
       php artisan octane:start --server=frankenphp --host=172.23.67.4 --port=8001 --https
     ```
 
-## Library Yang digunakan 
-
 <!-- USAGE EXAMPLES -->
 ## API DOCS
 
