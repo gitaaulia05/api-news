@@ -19,6 +19,7 @@ class NewsResource extends JsonResource
       
         return [
             'id_administrator' => $this->berita->id_administrator ??  $this->id_administrator,
+            'slug' => $this->berita->slug ??  $this->slug,
             'nama_jurnalis' => $this->administrator->nama ??  $this->nama,
             'id_berita' => $this->berita->id_berita ?? $this->id_berita,
             'slug' => $this->berita->slug ??$this->slug ,

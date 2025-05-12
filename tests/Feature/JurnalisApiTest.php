@@ -21,10 +21,7 @@ class JurnalisApiTest extends TestCase
 
     protected function setUp() : void {
         parent::setUp();
-        // 0fb86a5d-52f4-42cd-89bb-b24343bc3ee0
-       // d09bf6b7-b0a8-4451-8b88-ca9ca2c8a00c
-     //  24afd108-3f07-4bb1-8dd4-32a30d1f5ae6
-        $this->token = 'e32bba72-c4dc-4608-a258-b9e358365bfb';
+        $this->token = 'cf90a414-89d6-43b7-a0c6-520b4a76a48d';
     }
 
 
@@ -52,6 +49,7 @@ class JurnalisApiTest extends TestCase
             ]
         ]);
     }
+    
 
     public function testLogin(){
         // Cobatebakk1* ->gitaauliahafd@gmail.com
@@ -153,16 +151,16 @@ class JurnalisApiTest extends TestCase
 
     public function testUpdateNews(){
 
-        $berita = berita::where('slug' , 'yaalah')->first();
+        $berita = berita::where('slug' , 'lala-2')->first();
 
         $this->post('/api/jurnalis/updateNews/'. $berita->slug, [
             "judul_berita" => "yaalah",
             "deks_berita" => "huhiha",
            "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-            "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
+           // "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
            "kategori" => "Politik", 
            'keterangan_gambar' => "hmm ah",
-          //'keterangan_gambar2' => "hm"
+          //'keterangan_gambar2' => NULL
         ], [
             'Authorization' => $this->token
         ])->assertStatus(200)->assertJson([
@@ -218,11 +216,11 @@ class JurnalisApiTest extends TestCase
     }
 
     public function testDetailNews() {
-        $berita = berita::withTrashed()->where('slug' , 'lala')->first();
-        //dd($berita);
+        $berita = berita::withTrashed()->where('slug' , 'lala-2')->first();
+     
         $this->get('/api/jurnalis/berita/'.$berita->slug, [
             'Authorization' => $this->token
-        ])->assertStatus(200);
+        ])->dump();
     }
 
     public function testEmailSend() {

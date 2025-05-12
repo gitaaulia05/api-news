@@ -86,12 +86,12 @@ Route::middleware(JurnalisMiddleware::class)->group(function () {
     Route::post('/jurnalis/update/{slugAdmin}' , [AdminController::class , 'updateData']);
     Route::get('/jurnalis/{slugAdmin}' , [AdminController::class , 'showData'] );
     Route::delete('/jurnalis/logout' , [AdminController::class , 'logout']);
+        Route::get('/berita', [NewsController::class , 'index']);
 
     Route::middleware(JurnalisActiveMiddleware::class)->group(function(){
      // MAIN FEATURE
         Route::post('/jurnalis/addNews' , [NewsController::class , 'storeNews']);
         Route::post('/jurnalis/updateNews/{slugBerita}' ,[NewsController::class , 'updateNews'] );
-        Route::get('/berita', [NewsController::class , 'index']);
         Route::get('/jurnalis/berita/{slugBerita}',[NewsController::class , 'showNews']);
     });
   

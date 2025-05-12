@@ -66,7 +66,7 @@ class NewsController extends Controller
         $pengguna = Pengguna::where('token' , $token)->first();
         // dd( Carbon::today()->toDateString());
         $pageNews= $request->input('page', 1);
-        $size = $request->input('size' , 15);
+     $size = $request->input('size' , 15);
 
         $Pengguna = Auth::guard('administrator')->user();
 
@@ -86,7 +86,6 @@ class NewsController extends Controller
         // $newsQuery->where(function (Builder $query) use ($nama , $newest, $selectedTopics,) {
           
                 if($nama) {
-                    dd($nama);
                     $newsQuery->where('judul_berita' , 'like' , '%'.$nama.'%');
                 }
 
@@ -183,8 +182,7 @@ class NewsController extends Controller
 
 
 public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResource
-{
-    
+{ 
     $berita = berita::where('slug', $slugBerita)->first();
 
     if (!$berita) {
@@ -195,7 +193,7 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
     
     $data = $request->validated();
     $kategori = kategori_berita::where('kategori' , $data['kategori'])->first();
-  //  dd($kategori->id_kategori_berita);
+
     // Update berita
     $berita->update([
         'judul_berita' => $data['judul_berita'],
@@ -206,7 +204,7 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
     // **Cek dan Update Gambar**
     $gambarFields = [
         ['file' => 'gambar', 'keterangan' => 'keterangan_gambar', 'posisi_gambar' => 'gambar utama'],
-        ['file' => 'gambar2', 'keterangan' => 'keterangan_gambar2', 'posisi_gambar' => 'gambar opsional']
+        ['file' => 'gambar2', 'keterangan' => 'keterangan_gambar2', 'posisi_gambar' => 'gambar tambahan']
     ];
 
     $gambarBeritaList = gambar_berita::where('id_berita', $berita->id_berita)
@@ -254,12 +252,14 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
     return new NewsResource($berita);
 }
 
-    public function showNews($slugBerita) : NewsResource
+    public function showNews(Request $request, $slugBerita) : NewsResource
     {
+      
+        $tokenJurnalis =  $request->bearerToken();
+        $admin = Administrator::where('token'  , $tokenJurnalis)->first();
         
-        $admin = Auth::guard('administrator')->user();
+        $query = berita::withTrashed()->where("slug" , $slugBerita);
 
-        $query = berita::withTrashed("slug" , $slugBerita)->first();
         if($admin->role == 2){
            $query->where('id_administrator' , $admin->id_administrator);
         } 
@@ -443,28 +443,6 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
         $visitorKey = md5($request->ip() .$request->userAgent());
         $slug->visit($visitorKey)->withIp($request->ip());
             return new NewsResource($slug);
-    }
-
-    public function showNew($slugBerita) : NewsResource
-    {
-        $admin = Auth::guard('administrator')->user();
-        $query = berita::withTrashed("slug" , $slugBerita)->first();
-        if($admin->role == 2){
-           $query->where('id_administrator' , $admin->id_administrator);
-        } 
-
-        $news = $query->first();
-        if(!$news){
-            throw new HttpResponseException(response([
-                "errors" => [
-                    "message" => [
-                        "Berita Tidak Ditemukan"
-                    ]
-                ]
-            ], 401));
-        }
-
-        return new NewsResource($news);
     }
 
     public function popularNews(Request $request) : NewsCollection|JsonResponse{
