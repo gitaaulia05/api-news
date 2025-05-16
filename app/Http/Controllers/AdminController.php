@@ -41,8 +41,11 @@ class AdminController extends Controller
     public function currentAdmin( Request $request) : AdminResource
         {
                 $token = $request->bearerToken();
+            
                 $admin = Administrator::where('token' , $token)->first();
-                //Auth::guard('administrator')->user();
+                   \Log::info("Current token: $token");
+    \Log::info("Admin from token: " . optional($admin)->nama);
+               
                 return new AdminResource($admin);
         }
     public function updateActive(JurnalisActiveRequest $request , $slugJurnalis) : AdminResource{

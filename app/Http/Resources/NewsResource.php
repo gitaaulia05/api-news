@@ -29,7 +29,8 @@ class NewsResource extends JsonResource
             'created_at' => $this->berita->created_at ?? $this->created_at,
             'simpanBerita' =>  $this->simpanBerita && $this->simpanBerita->isNotEmpty(),
             'updated_at' => Carbon::parse($this->berita->updated_at ??$this->updated_at)->diffForHumans(),
-            'kategori_berita' => $this->kategori_berita->kategori ?? $this->berita->kategori_berita->kategori,
+           'kategori_berita' => $this->kategori_berita?->kategori 
+                     ?? $this->berita?->kategori_berita?->kategori,
             'gambar' =>($this->berita->gambar_berita ?? $this->gambar_berita)?->map(function($detail) {
                 return [
                     'gambar_berita' => $detail->gambar_berita,

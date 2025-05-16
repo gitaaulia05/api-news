@@ -83,7 +83,6 @@ class PenggunaController extends Controller
         $berita = berita::where('slug' , $slugBerita)->first();
 
         $simpanBerita = simpanBerita::where('slug' , $slugBerita)->where('id_pengguna' , $pengguna->id_pengguna)->exists();
-
         if(!$pengguna || !$berita){
             throw new HttpResponseException(response([
                 "errors" =>[
@@ -122,9 +121,9 @@ class PenggunaController extends Controller
         $tokenHeader = $request->bearerToken();
 
         $pengguna = pengguna::where('token', $tokenHeader)->first(); 
-     
+       
         $pageNews= $request->input('page', 1);
-        $size = $request->input('size' , 15);
+        $size = $request->input('size' , 1);
 
         $judul = $request->input('judul_berita');
 
@@ -134,17 +133,18 @@ class PenggunaController extends Controller
             'berita' => function($q) {
                 $q->withTrashed();
             }
-        ])
+        ])->where('id_pengguna' , $pengguna->id_pengguna)
         ->whereHas('berita', function ($q) use ($judul, $pengguna) {
-            $q->withTrashed(); // ← ini juga penting
+            $q->withTrashed(); 
             if ($judul) {
                 $q->where('judul_berita', 'like', '%' . $judul . '%');
             }
-            $q->where('id_pengguna' , $pengguna->id_pengguna);
         })
-        ->whereHas('berita.kategori_berita');
+        ->whereHas('berita.kategori_berita' , function($q){
+            $q->whereNotNull('id_kategori_berita');
+        });
         
-        $news = $query->paginate($size, ['*'], 'page', $pageNews);
+        $news = $query->paginate(perPage: $size, page: $pageNews);
 
         return new NewsCollection($news);
     }
@@ -195,11 +195,7 @@ class PenggunaController extends Controller
             $path = $request->file('gambar')->store('gambarPengguna' , 'public');
            $pengguna->gambar = $path;
         }
-
-        // if(!$request->file('gambar') &&  Storage::disk('public')->exists($pengguna->gambar)) {
-        //     Storage::disk('public')->delete($pengguna->gambar);
-        //     $pengguna->gambar = '';
-        // }    
+ 
 
         $data = $request->validated();
         unset($data['gambar']);

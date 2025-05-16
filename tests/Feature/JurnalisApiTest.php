@@ -21,7 +21,7 @@ class JurnalisApiTest extends TestCase
 
     protected function setUp() : void {
         parent::setUp();
-        $this->token = 'cf90a414-89d6-43b7-a0c6-520b4a76a48d';
+        $this->token = '9a104872-66ef-4a65-819c-34ca8852a559';
     }
 
 
@@ -82,21 +82,14 @@ class JurnalisApiTest extends TestCase
 
 
 
-    public function testDetail(){
-        $pengguna = Administrator::where('nama' , 'niks')->first();
-        $this->actingAs($pengguna , 'pengguna');
-
-        $this->get('/api/jurnalis/niks' , [
-            'Authorization' => $this->token
-        ])->assertStatus(200);
+    public function testDetailJ(){
+        $this->withHeaders([
+             'Authorization' => 'Bearer '.$this->token,
+            ])->get('/api/jurnalis')->assertStatus(200);
     }
 
 
     public function testCurrent(){
-        
-        $administrator = Administrator::where('role' , '2')->first();
-        
-        $this->actingAs($administrator , 'administrator');
            
         $this->get('/api/jurnalis', [
             'Authorization' => $this->token
@@ -109,7 +102,7 @@ class JurnalisApiTest extends TestCase
             "deks_berita" => "hahaha",
            "gambar" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
            "gambar2" => new \Illuminate\Http\UploadedFile(resource_path('testImg/indomie.jpg'), 'indomie.jpg', null, null, true),
-           "id_kategori_berita" => "Teknologi", 
+           "id_kategori_berita" => "huhu", 
            'keterangan_gambar' => "fmdmdm",
            'keterangan_gambar2' => "fmdmdm"
         ], [
@@ -266,5 +259,6 @@ class JurnalisApiTest extends TestCase
             'Authorization' => $this->token
         ])->assertStatus(200);
     }
+
 }
 

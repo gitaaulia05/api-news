@@ -19,6 +19,7 @@ class AdminMiddleware
     {
         $tokenAdmin = $request->header('Authorization');
 
+
         if($tokenAdmin && str_starts_with($tokenAdmin, 'Bearer ')){
             $tokenAdmin = substr($tokenAdmin, 7);
         }
@@ -31,6 +32,8 @@ class AdminMiddleware
       
 
         $administrator = Administrator::where('token' , $tokenAdmin)->where('role' , 1)->first();
+
+
         if(!$administrator || $administrator->role != 1 ){
             $authenticate = false;
           

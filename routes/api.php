@@ -73,6 +73,12 @@ Route::middleware(AdminMiddleware::class)->group(function () {
     // Main Feature
      Route::get('/berita', [NewsController::class , 'index']);
     Route::get('/berita/{slugBerita}', [NewsController::class , 'showNews']);
+
+     Route::get('/kategoriBerita', [NewsController::class , 'showCategory']);
+     Route::post('/kategoriBerita', [NewsController::class , 'storeCategory']);
+     Route::get('/kategoriBerita/{idKatBe}' , [NewsController::class , 'detailKategori']);
+     Route::patch('/kategoriBerita/{idKatBe}' , [NewsController::class , 'updateKategori']);
+     Route::delete('/kategoriBerita/{idKatBe}' , [NewsController::class , 'deleteKategori']);
 });
 
 //          ROUTE JURNALIS

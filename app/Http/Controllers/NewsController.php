@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Models\berita;
 use App\Models\Pengguna;
 use Illuminate\Support\Str;
+use App\Models\simpanBerita;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 use App\Models\gambar_berita;
@@ -20,6 +21,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\NewsCreateRequest;
 use App\Http\Requests\NewsUpdateRequest;
 use Illuminate\Database\Eloquent\Builder;
+use App\Http\Requests\kategoriBeritaRequest;
+use App\Http\Resources\kategoriBeritaResource;
+use App\Http\Resources\kategoriBeritaCollection;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class NewsController extends Controller
@@ -66,7 +70,7 @@ class NewsController extends Controller
         $pengguna = Pengguna::where('token' , $token)->first();
         // dd( Carbon::today()->toDateString());
         $pageNews= $request->input('page', 1);
-     $size = $request->input('size' , 15);
+        $size = $request->input('size' , 15);
 
         $Pengguna = Auth::guard('administrator')->user();
 
@@ -502,6 +506,93 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
     //dd($d->headers->all());
     }
 
+    public function showCategory(Request $request): kategoriBeritaCollection {
+        $pageNews= $request->input('page', 1);
+        $size = $request->input('size' , 15);
+
+        $kategoriData = kategori_berita::query();
+        $namaKategori = $request->input('kategori');
+
+        if($namaKategori){
+            $kategoriData->where('kategori' , 'like' , '%' . $namaKategori.'%');
+        }
+        $kd = $kategoriData->paginate(perPage: $size, page: $pageNews);
+
+        return new kategoriBeritaCollection ($kd);
+    }
+
+    public function detailKategori($idKatBe) : kategoriBeritaResource {
+           $kategoriBerita = kategori_berita::where('id_kategori_berita' , $idKatBe)->first();
+
+            if(!$kategoriBerita){
+                throw new HttpResponseException(response()->json([
+                    "errors" => [
+                        "message" => [
+                            "Nama Kategori Berita Tidak Ditemukan"
+                        ]
+                    ]
+                ])->setStatusCode(404));
+            }
+        return new kategoriBeritaResource ($kategoriBerita);
+    }
+
+
+    public function storeCategory(kategoriBeritaRequest $request) : JsonResponse {
+        $data = $request->validated();
+        $data['id_kategori_berita'] = (String) Str::uuid();
+
+        $kategori = new kategori_berita($data);
+        $kategori->save();
+
+        return (new kategoriBeritaResource($kategori))->response()->setStatusCode(201);
+    }
+
+    public function updateKategori(kategoriBeritaRequest $request, $idKatBe) : JsonResponse {
+        
+        $kategoriBerita = kategori_berita::where('id_kategori_berita' , $idKatBe)->first();
+        
+            if(!$kategoriBerita){
+                throw new HttpResponseException(response()->json([
+                    "errors" => [
+                        "message" => [
+                            "ID Kategori Berita Tidak Ditemukan"
+                        ]
+                    ]
+                ])->setStatusCode(404));
+            }
+
+        $data = $request->validated();
+        $kategoriBerita->fill($data);
+        $kategoriBerita->save();
+            return (new kategoriBeritaResource($kategoriBerita))->response()->setStatusCode(200);
+        }
+
+        public function deleteKategori(Request $request , $idKatBe) : JsonResponse {
+            $kategoriBerita = kategori_berita::where('id_kategori_berita' , $idKatBe)->first();
+           
+            if(!$kategoriBerita){
+                throw new HttpResponseException(response()->json([
+                    "errors" => [
+                        "message" => [
+                            "Nama Kategori Berita Tidak Ditemukan"
+                        ]
+                    ]
+                ])->setStatusCode(404));
+            }
+
+            $kategoriBerita->delete();
+            
+            $beritaList = berita::withTrashed()->where('id_kategori_berita' , $idKatBe)->get();
+
+            foreach ( $beritaList as $berita){
+                $berita->simpanBerita()->delete();
+                $berita->forceDelete();
+            }
+
+             return response()->json([
+            "data" => true
+        ])->setStatusCode(200);
+    }
 
     
 }

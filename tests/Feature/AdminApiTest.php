@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\berita;
+use App\Models\kategori_berita;
 use App\Models\Pengguna;
 use App\Models\Administrator;
 use Database\Seeders\AdminSeeder;
@@ -28,7 +29,8 @@ class AdminApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->token = 'baacec51-6979-47f9-90e9-1d712058ac1e'; // Inisialisasi token
+        $this->token = '975289c8-29b6-4516-8c9c-293446c10133'; // 
+        // Inisialisasi token
     }
 
     public function testUpdateActive(){
@@ -44,7 +46,7 @@ class AdminApiTest extends TestCase
     }
 
     public function testLogin(){
-        $this->seed([AdminSeeder::class]);
+       // $this->seed([AdminSeeder::class]);
         $this->post('/api/admin/login' , [
             'email' => 'seomoonamoon@gmail.com',
             'password' => 'tebakzzz'
@@ -128,6 +130,27 @@ class AdminApiTest extends TestCase
             'Authorization' => $this->token
         ])->dump();
       
+    }
+     public function testAddCategory(){
+        $this->withHeaders([  'Authorization' => 'Bearer '.$this->token])->post('api/kategoriBerita' , [
+            'kategori' => "huhu"
+        ])->assertStatus(201);
+    }
+
+    public function testShowCategory(){
+          $this->withHeaders([  'Authorization' => 'Bearer '.$this->token])->get('api/kategoriBerita?kategori=hiburan')->assertStatus(200);
+    }
+
+    public function testUpdateCategory(){
+         $this->withHeaders([  'Authorization' => 'Bearer '.$this->token])->patch('api/kategoriBerita/0652d4ea-637b-4b93-b1a1-33a57b79b061' , [
+            'kategori' => 'hahah'
+         ])->assertStatus(200);
+    }
+
+     public function testDeleteCategory(){
+        $berita = kategori_berita::where('kategori' , 'huhu')->first();
+
+         $this->withHeaders([  'Authorization' => 'Bearer '.$this->token])->delete('api/kategoriBerita/'.$berita->id_kategori_berita)->assertStatus(200);
     }
 }
 

@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,6 +20,8 @@ class JurnalisMiddleware
     {
 
         $tokenJurnal = $request->header('Authorization');
+      
+         Log::info('hasilnya '.   $tokenJurnal);
 
         if($tokenJurnal && str_starts_with($tokenJurnal , 'Bearer ')){
             $tokenJurnal = substr($tokenJurnal, 7);
@@ -31,6 +34,7 @@ class JurnalisMiddleware
         }
 
         $jurnalis = Administrator::where('token' , $tokenJurnal)->where('role' , 2)->first();
+        Log::info('namanya '. $jurnalis->token);
        
         if(!$jurnalis ||  $jurnalis->role !== 2){
             $authenticate = false;

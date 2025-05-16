@@ -24,7 +24,9 @@ class UserApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-       $this->token = '43e1781a-f1b7-416a-8631-e21370535600'; // Inisialisasi token
+      //  e986b551-3d1e-4c83-92e6-c33c007011e4
+        // b40cda48-c6ac-473b-813a-74f10b9a996f
+       $this->token = 'b40cda48-c6ac-473b-813a-74f10b9a996f'; // Inisialisasi token
     }
     public function test_example(): void
     {
@@ -156,7 +158,7 @@ class UserApiTest extends TestCase
     // }
 
     public function testKategoriNews(){
-        $this->get('/api/berita/pengguna?kategori=Ekonomi')->assertStatus(200);
+        $this->get('/api/berita/pengguna?selectedTopics=true')->assertStatus(200);
     }
 
 
@@ -183,7 +185,7 @@ class UserApiTest extends TestCase
     public function testSaveNews(){
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->token,
-        ])->post('/api/pengguna/simpanBerita/voluptatem-quis-illum-aut-et');
+        ])->post('/api/pengguna/simpanBerita/lalas-3');
         
         $response->assertStatus(201);
     }
@@ -192,7 +194,6 @@ class UserApiTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->token,
         ])->get('/api/pengguna/simpanBerita');
-        dump($response->json());
         $response->assertStatus(200);
     }
 
