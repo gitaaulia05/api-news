@@ -20,7 +20,7 @@ class JurnalisMiddleware
     {
 
         $tokenJurnal = $request->header('Authorization');
-      
+    
          Log::info('hasilnya '.   $tokenJurnal);
 
         if($tokenJurnal && str_starts_with($tokenJurnal , 'Bearer ')){

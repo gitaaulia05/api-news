@@ -35,7 +35,9 @@ class NewsController extends Controller
         $pageNews= $request->input('page', 1);
         $size = $request->input('size' , 15);
 
-        $Pengguna = Auth::guard('administrator')->user();
+        $token = $request->bearerToken();
+      
+        $Pengguna = Administrator::where('token' , $token)->first();
 
         $newsQuery = berita::withTrashed();
 
@@ -289,16 +291,15 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
 
 
         $isJurnalis = Administrator::where('token' , $token)->first();
-
+      
         if($isJurnalis->role == 2){
-            $query->where("slug" , $slugBerita)->whereHas('administrator' , function($q) use ($token){
-                $q->where('token' , $token);
+            $query->where("slug" , $slugBerita)->whereHas('administrator' , function($q) use ($isJurnalis ){
+                $q->where('token' , $isJurnalis->token);
             });
         }
       
         $news = $query->first();
-
-        
+      
         if(!$news || !$isJurnalis ){
             throw new HttpResponseException(response([
                 "errors" => [
@@ -314,7 +315,7 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
             throw new HttpResponseException(response([
                 "errors" => [
                     "message" => [
-                        "Berita Harus Hapus 30 Hari Terlebih Dahuluh"
+                        "Berita Harus Hapus 30 Hari Terlebih Dahulu"
                     ]
                 ]
             ], 401));
@@ -334,8 +335,7 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
         ])->setStatusCode(200);
 
     }   
-
-
+    
     public function trashBin() : NewsCollection {
         $jurnalis = Auth::guard('administrator')->user;
         $news = berita::onlyTrashed()->where('id_administrator' , $jurnalis->id_administrator)->get();
@@ -394,17 +394,19 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
 
         $token = $request->bearerToken();
 
-        $berita = berita::onlyTrashed()->where('slug' , $slugBerita)->first();
-    
+        $query = berita::onlyTrashed()->where('slug' , $slugBerita);
+  
       
         $isJurnalis = Administrator::where('token' , $token)->first();
 
        
         if($isJurnalis->role == 2){
-            $berita->where("slug" , $slugBerita)->whereHas('administrator' , function($q) use ($token){
-                $q->where('token' , $token);
-            });
+           $query->whereHas('administrator' ,  function($q) use ($token) {
+            $q->where('token'  , $token);
+           });
         }
+
+        $berita = $query->with('administrator')->first();
     
         if(empty($berita->slug)) {
             throw new HttpResponseException(response([
@@ -420,14 +422,18 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
             throw new HttpResponseException(response([
                 "errors" => [
                     "message" => [
-                        "Berita Tidak Ditemukan!"
+                        "Berita Tidak Ditemukan atau Anda Tidak memiliki akses!"
                     ]
                 ]
             ], 401));
         }
 
 
+
+        simpanBerita::where('id_berita', $berita->id_berita)->delete();
+
         $berita->forceDelete();
+
         return response()->json([
             "data" => true
         ])->setStatusCode(200);
@@ -581,15 +587,15 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
             }
 
             $kategoriBerita->delete();
-            
-            $beritaList = berita::withTrashed()->where('id_kategori_berita' , $idKatBe)->get();
 
-            foreach ( $beritaList as $berita){
-                $berita->simpanBerita()->delete();
-                $berita->forceDelete();
-            }
+            $beritaIds = berita::withTrashed()->where('id_kategori_berita' , $idKatBe)->pluck('id_berita');
 
-             return response()->json([
+            simpanBerita::whereIn('id_berita' , $beritaIds)->delete();
+
+            berita::withTrashed()->whereIn('id_berita' , $beritaIds)->forceDelete();
+        
+
+             return response()->json([  
             "data" => true
         ])->setStatusCode(200);
     }

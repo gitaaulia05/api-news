@@ -54,7 +54,7 @@ class JurnalisApiTest extends TestCase
     public function testLogin(){
         // Cobatebakk1* ->gitaauliahafd@gmail.com
         $this->post('/api/jurnalis/login' , [
-            'email' => 'niki@gmail.com',
+            'email' => 'ulala@gmail.com',
             'password' => 'Cobatebakk1*'
         ])->assertStatus(200);
     }
@@ -182,7 +182,7 @@ class JurnalisApiTest extends TestCase
     }
 
     public function testDeleteNews(){
-        $berita = berita::withTrashed()->where('slug' , 'aut-ex-voluptatum-itaque-quibusdam-vel-harum-aut')->first();
+        $berita = berita::withTrashed()->where('slug' , 'lalas-3')->first();
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->token,
         ])->post('/api/beritaJurnalis/delete/'.$berita->slug)->assertStatus(200);
@@ -191,13 +191,13 @@ class JurnalisApiTest extends TestCase
 
 
     public function testForceNews(){
-        $berita = berita::withTrashed()->where('slug' , 'lalas')->first();
-        
+        $berita = berita::withTrashed()->where('slug' , 'lalas-3')->first();
+       
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->token,
         ])->post('/api/beritaJurnalis/deleteForce/'.$berita->slug)->assertStatus(200);
-
     }
+
     public function testRestoreNews(){
        // $berita = berita::where('slug' , 'hymz')->first();
        $berita = berita::withTrashed()->where('slug' , 'aut-ex-voluptatum-itaque-quibusdam-vel-harum-aut')->first();

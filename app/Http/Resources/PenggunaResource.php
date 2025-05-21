@@ -21,7 +21,6 @@ class PenggunaResource extends JsonResource
             'alamat' => $this->alamat,
             'gambar' => $this->gambar,
             'token' => $this->token,
-            'role' => $this->role,
             'pendidikan_terakhir' => $this->pendidikan_terakhir,
             'pekerjaan' => $this->pekerjaan,
         ];

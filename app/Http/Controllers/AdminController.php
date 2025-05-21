@@ -43,8 +43,7 @@ class AdminController extends Controller
                 $token = $request->bearerToken();
             
                 $admin = Administrator::where('token' , $token)->first();
-                   \Log::info("Current token: $token");
-    \Log::info("Admin from token: " . optional($admin)->nama);
+            
                
                 return new AdminResource($admin);
         }

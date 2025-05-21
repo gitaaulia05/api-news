@@ -25,7 +25,7 @@ class AdminUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'gambar' => ['nullable' , 'image' , 'mimes:jpeg,png,jpg|max:2048'],
+             'gambar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'], 
             'nama' => ['required']
         ];
     }

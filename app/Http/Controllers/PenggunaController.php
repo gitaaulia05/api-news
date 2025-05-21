@@ -123,7 +123,7 @@ class PenggunaController extends Controller
         $pengguna = pengguna::where('token', $tokenHeader)->first(); 
        
         $pageNews= $request->input('page', 1);
-        $size = $request->input('size' , 1);
+        $size = $request->input('size' , 15);
 
         $judul = $request->input('judul_berita');
 
@@ -351,19 +351,23 @@ class PenggunaController extends Controller
         
 
         $owner = $password->resettable;
+
         $data = $request->validated();
          
         $owner->update([
             'password' => Hash::make($data['password']),
         ]);
-        
+  
         $password->delete();
+
+  $checkAdmin = $owner instanceof \App\Models\Administrator ;
+     
         return response()->json([
             'data' => [
-                'success' => true,
-            'owner' => $owner->resettable_id,
+            'success' => true,
+            'owner' =>  $checkAdmin ? $owner->id_administrator : $owner->id_pengguna,
             'type' => get_class($owner), 
-            'role' => $owner instanceof App\Models\Administrator ? $owner->role : 'user'
+            'role' =>  $owner->role
             ]
         ])->setStatusCode(200);
     }

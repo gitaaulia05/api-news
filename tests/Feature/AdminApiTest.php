@@ -29,7 +29,7 @@ class AdminApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->token = '975289c8-29b6-4516-8c9c-293446c10133'; // 
+        $this->token = '17f581a8-3f7c-4f15-81c4-92c8715aa211'; // 
         // Inisialisasi token
     }
 
@@ -49,7 +49,15 @@ class AdminApiTest extends TestCase
        // $this->seed([AdminSeeder::class]);
         $this->post('/api/admin/login' , [
             'email' => 'seomoonamoon@gmail.com',
-            'password' => 'tebakzzz'
+            'password' => 'Cobatebakk1&'
+        ])->assertStatus(200);
+    }
+
+     public function testGetToken(){
+       // $this->seed([AdminSeeder::class]);
+        $this->patch('/api/lupa-password/83921ade7c26434f864e2e5d250fb50d', [
+            'password' => 'Cobatebakk1&',
+            'password_confirmation' => 'Cobatebakk1&'
         ])->assertStatus(200);
     }
 
@@ -151,6 +159,14 @@ class AdminApiTest extends TestCase
         $berita = kategori_berita::where('kategori' , 'huhu')->first();
 
          $this->withHeaders([  'Authorization' => 'Bearer '.$this->token])->delete('api/kategoriBerita/'.$berita->id_kategori_berita)->assertStatus(200);
+    }
+
+     public function testBerita(){
+         $this->withHeaders([  'Authorization' => 'Bearer '.$this->token])->get('api/berita')->assertStatus(200);
+    }
+
+      public function testCurrent(){
+          $this->withHeaders([  'Authorization' => 'Bearer '.$this->token])->get('api/administrator')->dump();
     }
 }
 

@@ -21,7 +21,7 @@ Route::post("/pengguna/login" , [PenggunaController::class , 'login']);
 Route::post("/gantiPassword" , [PenggunaController::class , 'sendEmail']);
                 // CHANGE PASS WITHOUT AUTH
 Route::post("/pengguna/token-check/{token}" , [PenggunaController::class , 'checkToken']);
-            //edit pass fineal
+            //edit pass final
 Route::patch("/lupa-password/{token}" , [PenggunaController::class , 'forgetPassword']);
 
 
@@ -65,16 +65,15 @@ Route::post('/admin/login', [AdminController::class, 'login']);
 Route::middleware(AdminMiddleware::class)->group(function () {
     Route::get('/admin' , [AdminController::class , 'currentAdmin']);
     Route::post('/jurnalis/active/{slugJurnalis}' , [AdminController::class , 'updateActive']);
-    Route::patch('/admin/update/{slugAdmin}' , [AdminController::class , 'updateData']);
+    // Route::patch('/admin/update/{slugAdmin}' , [AdminController::class , 'updateData']);
     Route::get('/admin/jurnalis/search' , [AdminController::class , 'searchJurnalis'] );
     Route::get('/admin/jurnalis/{slugAdmin}' , [AdminController::class , 'showData'] );
     Route::delete('/admin/logout' , [AdminController::class , 'logout']);
 
     // Main Feature
-     Route::get('/berita', [NewsController::class , 'index']);
     Route::get('/berita/{slugBerita}', [NewsController::class , 'showNews']);
 
-     Route::get('/kategoriBerita', [NewsController::class , 'showCategory']);
+    
      Route::post('/kategoriBerita', [NewsController::class , 'storeCategory']);
      Route::get('/kategoriBerita/{idKatBe}' , [NewsController::class , 'detailKategori']);
      Route::patch('/kategoriBerita/{idKatBe}' , [NewsController::class , 'updateKategori']);
@@ -88,12 +87,10 @@ Route::post('/jurnalis/register' , [JurnalisController::class , 'register']);
 
 
 Route::middleware(JurnalisMiddleware::class)->group(function () {
-    Route::get('/jurnalis' , [AdminController::class , 'currentAdmin']);
-    Route::post('/jurnalis/update/{slugAdmin}' , [AdminController::class , 'updateData']);
+  
     Route::get('/jurnalis/{slugAdmin}' , [AdminController::class , 'showData'] );
     Route::delete('/jurnalis/logout' , [AdminController::class , 'logout']);
-        Route::get('/berita', [NewsController::class , 'index']);
-
+    
     Route::middleware(JurnalisActiveMiddleware::class)->group(function(){
      // MAIN FEATURE
         Route::post('/jurnalis/addNews' , [NewsController::class , 'storeNews']);
@@ -104,6 +101,13 @@ Route::middleware(JurnalisMiddleware::class)->group(function () {
 });
 
 Route::middleware(UniversalMiddleware::class)->group(function(){
+     Route::get('/berita', [NewsController::class , 'index']);
+
+     Route::get('/kategoriBerita', [NewsController::class , 'showCategory']);
+
+    Route::get('/administrator' , [AdminController::class , 'currentAdmin']);
+    Route::post('/administrator/update/{slugAdmin}' , [AdminController::class , 'updateData']);
+     
      // SOFT DELETE
      Route::post('/beritaJurnalis/delete/{slugBerita}' ,[NewsController::class , 'softDelete']);
     
