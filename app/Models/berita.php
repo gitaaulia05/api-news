@@ -32,6 +32,7 @@ class berita extends Model implements CanVisit
         'deks_berita',
         'is_tayang',
         'deleted_at',
+        'target_delete',
         'created_at',
         'updated_at'
     ];

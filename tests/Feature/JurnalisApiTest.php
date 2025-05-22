@@ -4,13 +4,15 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\berita;
-use App\Models\kategori_berita;
+use Faker\Factory as Faker;
 use App\Models\Administrator;
 // use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Faker\Factory as Faker;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Carbon;
+use App\Models\kategori_berita;
+use Symfony\Component\Clock\now;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class JurnalisApiTest extends TestCase
 {
@@ -21,7 +23,7 @@ class JurnalisApiTest extends TestCase
 
     protected function setUp() : void {
         parent::setUp();
-        $this->token = '9a104872-66ef-4a65-819c-34ca8852a559';
+        $this->token = 'e5f7294f-5e36-4e69-90f1-e1d9191d7510';
     }
 
 
@@ -182,7 +184,8 @@ class JurnalisApiTest extends TestCase
     }
 
     public function testDeleteNews(){
-        $berita = berita::withTrashed()->where('slug' , 'lalas-3')->first();
+       // dd(Carbon::today()->toDateString());
+        $berita = berita::withTrashed()->where('slug' , 'aut-dolorem-exercitationem-inventore-et-incidunt-et-saepe')->first();
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->token,
         ])->post('/api/beritaJurnalis/delete/'.$berita->slug)->assertStatus(200);
@@ -200,7 +203,7 @@ class JurnalisApiTest extends TestCase
 
     public function testRestoreNews(){
        // $berita = berita::where('slug' , 'hymz')->first();
-       $berita = berita::withTrashed()->where('slug' , 'aut-ex-voluptatum-itaque-quibusdam-vel-harum-aut')->first();
+       $berita = berita::withTrashed()->where('slug' , 'lalas')->first();
         //dd($berita);
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->token,

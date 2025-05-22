@@ -81,7 +81,7 @@ class NewsController extends Controller
             $query->where('id_pengguna' , $pengguna->id_pengguna);
           }
         },
-        'administrator']);
+        'administrator'])->where('is_tayang' , 1);
      //   dd($newsQuery);
         $queryForCache = clone $newsQuery;
 
@@ -299,7 +299,7 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
         }
       
         $news = $query->first();
-      
+
         if(!$news || !$isJurnalis ){
             throw new HttpResponseException(response([
                 "errors" => [
@@ -322,11 +322,12 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
         }
 
 
-        $news->update([
-            'is_tayang' => '2'
-        ]);
-
         $news->delete();
+        $news = berita::withTrashed()->find($news->id_berita);
+         $news->update([
+            'is_tayang' => '2',
+            'target_delete' => $news->deleted_at->copy()->addDays(30),
+        ]);
 
         return response()->json([
             "data" => [
@@ -356,8 +357,6 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
             });
         }
 
-      
-
         if(!$news || !$isJurnalis){
             throw new HttpResponseException(response([
                 "errors" => [
@@ -379,7 +378,8 @@ public function updateNews(NewsUpdateRequest $request, $slugBerita): NewsResourc
             ], 401));
         }
         $news->update([
-            'is_tayang' => '1'
+            'is_tayang' => '1', 
+            'target_delete' => NULL
         ]);
             $news->restore();
 
