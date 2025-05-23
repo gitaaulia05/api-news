@@ -64,15 +64,15 @@ Route::post('/admin/login', [AdminController::class, 'login']);
 
 Route::middleware(AdminMiddleware::class)->group(function () {
     Route::get('/admin' , [AdminController::class , 'currentAdmin']);
-    Route::post('/jurnalis/active/{slugJurnalis}' , [AdminController::class , 'updateActive']);
-    // Route::patch('/admin/update/{slugAdmin}' , [AdminController::class , 'updateData']);
-    Route::get('/admin/jurnalis/search' , [AdminController::class , 'searchJurnalis'] );
-    Route::get('/admin/jurnalis/{slugAdmin}' , [AdminController::class , 'showData'] );
     Route::delete('/admin/logout' , [AdminController::class , 'logout']);
+
+    Route::post('/jurnalis/active/{slugJurnalis}' , [AdminController::class , 'updateActive']);
+    Route::get('/admin/jurnalis/search' , [AdminController::class , 'searchJurnalis'] );
+
+    Route::get('/admin/jurnalis/{slugAdmin}' , [AdminController::class , 'showData'] );
 
     // Main Feature
     Route::get('/berita/{slugBerita}', [NewsController::class , 'showNews']);
-
     
      Route::post('/kategoriBerita', [NewsController::class , 'storeCategory']);
      Route::get('/kategoriBerita/{idKatBe}' , [NewsController::class , 'detailKategori']);
@@ -82,9 +82,7 @@ Route::middleware(AdminMiddleware::class)->group(function () {
 
 //          ROUTE JURNALIS
 Route::post('/jurnalis/login' , [JurnalisController::class , 'login']);
-Route::post('/jurnalis' , [JurnalisController::class , 'register']);
 Route::post('/jurnalis/register' , [JurnalisController::class , 'register']);
-
 
 Route::middleware(JurnalisMiddleware::class)->group(function () {
   
@@ -106,6 +104,7 @@ Route::middleware(UniversalMiddleware::class)->group(function(){
      Route::get('/kategoriBerita', [NewsController::class , 'showCategory']);
 
     Route::get('/administrator' , [AdminController::class , 'currentAdmin']);
+    
     Route::post('/administrator/update/{slugAdmin}' , [AdminController::class , 'updateData']);
      
      // SOFT DELETE

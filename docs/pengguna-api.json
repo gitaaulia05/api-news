@@ -316,6 +316,58 @@
                     }
                 }
             }
+        },        
+        "api/pengguna/{slugPengguna}" : {
+            "post": {
+                "description" :"Ubah informasi akun pengguna", 
+                "parameters":[
+                   {
+                    "nama": "Authorization",
+                    "in" :"header"
+                   }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Berhasil Login",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                        "type":"object",
+                                        "properties":{
+                                            "data":{
+                                                "type":"object",
+                                                "properties":{
+                                                    "nama":{
+                                                        "type":"string"
+                                                    },
+                                                    "alamat":{
+                                                        "type":"string"
+                                                    },
+                                                    "pendidikan_terakhir":{
+                                                        "type":"string"
+                                                    },
+                                                    "pekerjaan":{
+                                                        "type":"string"
+                                                    },
+                                                    "gambar": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "description": "URL gambar pengguna"
+                                                }
+                                                }
+                                            },
+                                            "errors":{
+                                                "type":"object"
+                                               
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+
+                    }
+                }
+            }
         },
         "api/pengguna/logout":{
             "delete":{

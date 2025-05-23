@@ -41,10 +41,7 @@ class AdminController extends Controller
     public function currentAdmin( Request $request) : AdminResource
         {
                 $token = $request->bearerToken();
-            
                 $admin = Administrator::where('token' , $token)->first();
-            
-               
                 return new AdminResource($admin);
         }
     public function updateActive(JurnalisActiveRequest $request , $slugJurnalis) : AdminResource{
@@ -82,11 +79,10 @@ class AdminController extends Controller
     public function updateData(AdminUpdateRequest $request , $slugAdmin) : AdminResource{
         $administratorAuth = Auth::guard('administrator')->user();
 
-        // dd($administratorAuth->slug);
         $adminSlug = Administrator::where('slug' , $slugAdmin)->first();
 
-            $adminId = Administrator::where('id_administrator' , $adminSlug->id_administrator)->first();
-           // dd($adminId);
+        $adminId = Administrator::where('id_administrator' , $adminSlug->id_administrator)->first();
+
             if(!$adminId || $administratorAuth->slug != $slugAdmin){
                 throw new HttpResponseException(response()->json([
                     "errors" => [
@@ -111,24 +107,28 @@ class AdminController extends Controller
         return (new AdminResource($adminId));
     }
 
-    public function searchJurnalis(request $request) : JurnalisCollection{
+    public function searchJurnalis(request $request) : JsonResponse | JurnalisCollection{
         $pageJurnal = $request->input('page',1);
         $size = $request->input('size' , 15);
 
         $jurnalis = Administrator::query()->where('role' , 2);
 
         $nama = $request->input('nama');
-        
+
         $jurnalis->where(function (Builder $query) use ($nama) {
             if($nama){
                 $query->where('role' , 2)->where('nama' , 'like' , '%' . $nama . '%');
             }
-
         });
 
         $jurnalis =  $jurnalis->paginate(perPage : $size , page : $pageJurnal);
 
-        return new JurnalisCollection($jurnalis);
+        return 
+        response()->json(
+            ( new JurnalisCollection($jurnalis))->response()->getData(true) + [
+                'total_jurnalis_aktif' => Administrator::where('role' , 2)->where('active' , 1)->count()
+            ]
+            );
     }
 
     public function showData($slugAdmin) : AdminResource{
@@ -147,7 +147,6 @@ class AdminController extends Controller
         $authPengguna = Auth::guard('pengguna')->user();
         $jurnalis = null;
        
-       // dd($authPengguna->slug == $adminCheck->slug);
         if ($adminCheck->role == 1 && $authAdmin && $authAdmin->slug == $adminCheck->slug) {
                 $jurnalis = Administrator::where('slug' , $slugAdmin)->where('role',1)->first();
                 
@@ -167,14 +166,9 @@ class AdminController extends Controller
         }
       
         return new AdminResource($jurnalis);
-      
     }
 
-
-
-
     public function logout(Request $request) : JsonResponse {
-
         $admin = Auth::guard('administrator')->user();
         
         if(!$admin) {

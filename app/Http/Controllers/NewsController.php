@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Log;
 use session;
-use Carbon\Carbon;
 use App\Models\berita;
 use App\Models\Pengguna;
 use Illuminate\Support\Str;
@@ -12,6 +11,7 @@ use App\Models\simpanBerita;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 use App\Models\gambar_berita;
+use Illuminate\Support\Carbon;
 use App\Models\kategori_berita;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\NewsResource;
@@ -29,9 +29,9 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 class NewsController extends Controller
 {
 
-    public function index(Request $request) : NewsCollection
+    public function index(Request $request) : NewsCollection | JsonResponse
     {  
-        // dd( Carbon::today()->toDateString());
+
         $pageNews= $request->input('page', 1);
         $size = $request->input('size' , 15);
 
@@ -64,7 +64,14 @@ class NewsController extends Controller
         });
 
         $news = $newsQuery->paginate(perPage : $size , page: $pageNews);
-        return new NewsCollection($news);
+        $now = Carbon::today()->toDateString();
+
+        return response()->json((new NewsCollection($news))->response()->getData(true) +[
+        'total_berita_tayang' =>  berita::withTrashed()->where('is_tayang' , 1)->whereDate('created_at', $now)->count(),
+        'total_berita_terhapus' =>  berita::withTrashed()->where('is_tayang', 2)->count(),
+        ]
+        );
+
     }
 
     public function allNews(Request $request):  NewsCollection | JsonResponse {
@@ -149,7 +156,15 @@ class NewsController extends Controller
         if($request->header('If-None-Match') === $etag){
             return response()->json(null, 304);
         }
-    return (new NewsCollection($news))->response()->header('ETag', $etag);
+        $data = (new NewsCollection($news))->response()->getData(true);
+    return response()->json([
+         'data' => $data['data'],
+        'links' => $data['links'],
+        'meta' => $data['meta'],
+        'total_berita_tayang' =>  berita::withTrashed()->where('is_tayang' , 1)->count(),
+        'total_berita_terhapus' =>  berita::withTrashed()->where('is_tayang', 2)->count(),
+    ])->header('ETag', $etag);
+
        
     }
     

@@ -29,7 +29,7 @@ class AdminApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->token = '17f581a8-3f7c-4f15-81c4-92c8715aa211'; // 
+        $this->token = '8ec220a6-6af6-4aaf-a24d-9177065dd0ce'; // 
         // Inisialisasi token
     }
 
@@ -131,10 +131,7 @@ class AdminApiTest extends TestCase
     }
 
     public function testSearchBerita() {
-        $administrator = Administrator::where('nama' , 'gita')->first();
-        $this->actingAs($administrator , 'administrator');
-        $berita = berita::withTrashed()->first();
-          $this->get('/api/berita/'.$berita->slug, [
+          $this->get('/api/berita/', [
             'Authorization' => $this->token
         ])->dump();
       
