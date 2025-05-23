@@ -508,8 +508,6 @@
               }
             }
         },
-
-         },
         "/kategoriBerita/{idKatbe}": {
             "patch": {
               "description": "Mengubah Kategori berita",
@@ -587,5 +585,7 @@
               }
             }
         }
+        
+    }
   }
 }

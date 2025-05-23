@@ -24,7 +24,6 @@ Route::post("/pengguna/token-check/{token}" , [PenggunaController::class , 'chec
             //edit pass final
 Route::patch("/lupa-password/{token}" , [PenggunaController::class , 'forgetPassword']);
 
-
 Route::get('/berita/pengguna', [NewsController::class , 'allNews']);
 
 // Counter visitor
